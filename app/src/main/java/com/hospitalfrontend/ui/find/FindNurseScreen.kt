@@ -11,15 +11,14 @@ import androidx.navigation.NavController
 
 @Composable
 fun FindNurseScreen(navController: NavController) {
-    // Lista de enfermeros
     val nurses = listOf(
         "Id 1: name = Paco Perez | username = pperez | password = paco123",
         "Id 2: name = Pepe Rodriguez | username = prodriguez | password = pepe123",
         "Id 3: name = Fran Gomez | username = fgomez | password = fran123",
-        "Id 4: name = Paco Lopez | username = plopez | password = paco456"
+        "Id 4: name = Paco Lopez | username = plopez | password = paco456",
+        "Id 5: name = Paco Rodriguez | username = parodriguez | password = paco789"
     )
 
-    // Estado para la entrada de texto y los resultados
     var input by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<String>>(emptyList()) }
     var error by remember { mutableStateOf(false) }
@@ -39,7 +38,6 @@ fun FindNurseScreen(navController: NavController) {
                 .padding(top = 32.dp, bottom = 16.dp)
         )
 
-        // Barra de búsqueda
         OutlinedTextField(
             value = input,
             onValueChange = { input = it },
@@ -52,7 +50,6 @@ fun FindNurseScreen(navController: NavController) {
         // Botón para buscar
         Button(
             onClick = {
-                // Filtra todos los enfermeros que contengan el texto ingresado (ignorando mayúsculas)
                 val found = nurses.filter { nurse ->
                     nurse.lowercase().contains(input.lowercase())
                 }
@@ -72,7 +69,6 @@ fun FindNurseScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mostrar los resultados
         if (results.isNotEmpty()) {
             Text(
                 text = "Results:",
@@ -88,7 +84,6 @@ fun FindNurseScreen(navController: NavController) {
             }
         }
 
-        // Mostrar mensaje de error si no hay resultados
         if (error) {
             Text(
                 text = "Error: No nurse found with the provided input.",
@@ -100,7 +95,6 @@ fun FindNurseScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón para volver
         Button(
             onClick = { navController.popBackStack() },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
