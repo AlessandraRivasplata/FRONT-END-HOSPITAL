@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.home
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -39,7 +40,7 @@ fun HomeScreen(navController: NavController) {
                 .padding(bottom = 24.dp)
         )
         Button(
-            onClick = { /* Desarrollo para el boton de login */ },
+            onClick = { navController.navigate("login_nurse") },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
             modifier = Modifier.fillMaxWidth()
         ) {
