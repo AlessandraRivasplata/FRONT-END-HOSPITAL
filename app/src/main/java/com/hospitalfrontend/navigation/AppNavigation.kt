@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
 import com.hospitalfrontend.ui.nurse.all.AllNursesScreen
+import com.hospitalfrontend.ui.find.FindNurseScreen // Importa FindNurseScreen
 
 @Composable
 fun AppNavigation() {
@@ -15,6 +16,6 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
         composable("all_nurses") { AllNursesScreen(navController) }
+        composable("find_nurse") { FindNurseScreen(navController) } // Nueva ruta
     }
 }
-

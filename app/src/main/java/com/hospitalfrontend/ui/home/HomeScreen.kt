@@ -48,7 +48,7 @@ fun HomeScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Desarrollo para el boton de findbyname */ },
+            onClick = { navController.navigate("find_nurse") }, // Navegar a FindNurseScreen
             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
             modifier = Modifier.fillMaxWidth()
         ) {
