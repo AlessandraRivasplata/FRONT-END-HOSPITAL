@@ -16,6 +16,6 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
         composable("all_nurses") { AllNursesScreen(navController) }
-        composable("find_nurse") { FindNurseScreen(navController) } // Nueva ruta
+        composable("find_nurse") { FindNurseScreen(navController) }
     }
 }
