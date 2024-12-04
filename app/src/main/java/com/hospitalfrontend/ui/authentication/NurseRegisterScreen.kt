@@ -22,15 +22,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
+import kotlinx.coroutines.delay
 
 
 @Composable
-fun NurseRegisterScreen(navController: NavController) {
+fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
-    var isLoginSuccess by remember { mutableStateOf(false) }
+    var isRegisterSuccess by remember { mutableStateOf(false) }
+    var isScreenLocked by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -135,16 +138,24 @@ fun NurseRegisterScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        if (validateCredentials(username.text, password.text)) {
-                            isLoginSuccess = true
-                            isError = false
+                        if (name.text.isNotEmpty() && username.text.isNotEmpty() && password.text.isNotEmpty()) {
+                            if (nurseAuthViewModel.register(name.text, username.text, password.text) != null) {
+                                isRegisterSuccess = true
+                                isError = false
+                            } else {
+                                errorMessage = "El username ya existe"
+                                isError = true
+                                isRegisterSuccess = false
+                            }
                         } else {
+                            errorMessage = "Todos los campos son obligatorios"
                             isError = true
-                            isLoginSuccess = false
+                            isRegisterSuccess = false
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isScreenLocked
                 ) {
                     Text(text = "Crear Cuenta", color = Color.White)
                 }
@@ -152,9 +163,12 @@ fun NurseRegisterScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .clickable {
-                            navController.navigate("login_nurse")
-                        }
+                        .clickable(
+                            enabled = !isScreenLocked,
+                            onClick = {
+                                navController.navigate("login_nurse")
+                            }
+                        )
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 ) {
@@ -162,14 +176,14 @@ fun NurseRegisterScreen(navController: NavController) {
                         text = "¿Ya tienes cuenta? Iniciar sesión",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
 
                 if (isError) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Usuario o contraseña incorrectos. Intenta nuevamente.",
+                        text = errorMessage,
                         color = Color.Red,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.fillMaxWidth(),
@@ -177,17 +191,26 @@ fun NurseRegisterScreen(navController: NavController) {
                     )
                 }
 
-                if (isLoginSuccess) {
+                if (isRegisterSuccess) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Login correcto",
+                        text = "Cuenta creada con éxito.",
                         color = Color.Green,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
+                    LaunchedEffect(key1 = isRegisterSuccess) {
+                        isScreenLocked = true
+                        delay(3000) // Esperar 3 segundos
+                        navController.navigate("login_nurse") {
+                            popUpTo("login_nurse") { inclusive = true }
+                        }
+                    }
                 }
             }
         }
     }
 }
+
+

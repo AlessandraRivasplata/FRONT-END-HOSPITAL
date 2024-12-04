@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import com.hospitalfrontend.R
 
 @Composable
-fun NurseLoginScreen(navController: NavController) {
+fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
@@ -116,7 +116,7 @@ fun NurseLoginScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        if (validateCredentials(username.text, password.text)) {
+                        if (nurseAuthViewModel.login(username.text, password.text) != null) {
                             isLoginSuccess = true
                             isError = false
                         } else {
@@ -173,11 +173,4 @@ fun NurseLoginScreen(navController: NavController) {
     }
 }
 
-fun validateCredentials(username: String, password: String): Boolean {
-    val validCredentials = mapOf(
-        "pperez" to "paco123",
-        "prodriguez" to "pepe123",
-        "fgomez" to "fran123"
-    )
-    return validCredentials[username] == password
-}
+
