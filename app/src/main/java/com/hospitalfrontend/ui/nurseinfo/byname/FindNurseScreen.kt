@@ -1,14 +1,17 @@
 package com.hospitalfrontend.ui.nurseinfo.byname
 
-
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.hospitalfrontend.R
 
 @Composable
 fun FindNurseScreen(navController: NavController) {
@@ -48,7 +51,6 @@ fun FindNurseScreen(navController: NavController) {
                 .padding(bottom = 16.dp)
         )
 
-        // Botón para buscar
         Button(
             onClick = {
                 val found = nurses.filter { nurse ->
@@ -77,11 +79,33 @@ fun FindNurseScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             results.forEach { result ->
-                Text(
-                    text = result,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
+                val details = result.split("|")
+                val name = details[0].split("=")[1].trim()
+                val username = details[1].split("=")[1].trim()
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.imagen_login_hospital),
+                        contentDescription = "Nurse Image",
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = "Name: $name",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Username: $username",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
         }
 
