@@ -2,7 +2,6 @@ package com.hospitalfrontend.ui.authentication
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -26,6 +26,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
     var isLoginSuccess by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -105,11 +106,22 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         isError = false
                     },
                     label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = isError,
+                    trailingIcon = {
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                painter = painterResource(
+                                    id = if (isPasswordVisible) R.drawable.ojo_abierto else R.drawable.ojo_cerrado
+                                ),
+                                contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -167,6 +179,13 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
+                }
+                LaunchedEffect(isLoginSuccess) {
+                    if (isLoginSuccess) {
+                        navController.navigate("home") {
+                            popUpTo("login_nurse") { inclusive = true }
+                        }
+                    }
                 }
             }
         }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -18,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -34,6 +37,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
     var isRegisterSuccess by remember { mutableStateOf(false) }
     var isScreenLocked by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -127,11 +131,22 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         isError = false
                     },
                     label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = isError,
+                    trailingIcon = {
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                painter = painterResource(
+                                    id = if (isPasswordVisible) R.drawable.ojo_abierto else R.drawable.ojo_cerrado
+                                ),
+                                contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
