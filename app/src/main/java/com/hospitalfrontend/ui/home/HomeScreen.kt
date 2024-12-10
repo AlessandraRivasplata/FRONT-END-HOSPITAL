@@ -39,14 +39,6 @@ fun HomeScreen(navController: NavController) {
                 .size(400.dp)
                 .padding(bottom = 24.dp)
         )
-        Button(
-            onClick = { navController.navigate("login_nurse") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Login", color = Color.White)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = { navController.navigate("find_nurse") }, // Navegar a FindNurseScreen
