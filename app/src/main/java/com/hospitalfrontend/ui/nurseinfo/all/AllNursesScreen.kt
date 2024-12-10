@@ -1,4 +1,4 @@
-package com.hospitalfrontend.ui.nurse.all
+package com.hospitalfrontend.ui.nurseinfo.all
 
 
 import androidx.compose.foundation.layout.*
