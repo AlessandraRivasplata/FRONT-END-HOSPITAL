@@ -1,16 +1,19 @@
 package com.hospitalfrontend.ui.nurseinfo.all
 
-
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.graphics.Color
+import com.hospitalfrontend.R // Asegúrate de que el paquete sea correcto para tus recursos
 
 @Composable
 fun AllNursesScreen(navController: NavController) {
@@ -29,13 +32,19 @@ fun AllNursesScreen(navController: NavController) {
                 .padding(top = 32.dp, bottom = 16.dp)
         )
 
-        Text(
-            text = "- Id 1: name = Paco Perez | username = pperez | password = paco123 \n" +
-                    "- Id 2: name = Pepe Rodriguez | username = prodriguez | password = pepe123 \n" +
-                    "- Id 3: name = Fran Gomez | username = fgomez | password = fran123 \n",
-            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 8.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Lista de usuarios
+        val nurses = listOf(
+            Triple(1, "Paco Perez", "pperez"),
+            Triple(2, "Pepe Rodriguez", "prodriguez"),
+            Triple(3, "Fran Gomez", "fgomez")
         )
+
+        nurses.forEach { (id, name, username) ->
+            NurseItem(id, name, username)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -45,6 +54,29 @@ fun AllNursesScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Volver", color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun NurseItem(id: Int, name: String, username: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.imagen_login_hospital),
+            contentDescription = "Imagen de usuario",
+            modifier = Modifier
+                .size(64.dp)
+                .padding(end = 8.dp)
+        )
+        Column {
+            Text(text = "Id: $id")
+            Text(text = "Name: $name")
+            Text(text = "Username: $username")
         }
     }
 }
