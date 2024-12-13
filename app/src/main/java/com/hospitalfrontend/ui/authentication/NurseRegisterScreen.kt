@@ -15,7 +15,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,10 +27,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
 import kotlinx.coroutines.delay
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
@@ -48,6 +54,27 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     .background(Color(0xFFE73843)),
                 contentAlignment = Alignment.TopCenter
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 1f)),
+                                    startY = size.height - 250f,
+                                    endY = size.height
+                                )
+                            )
+                        }
+                ) {
+                    GlideImage(
+                        model = R.drawable.gif,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .height(200.dp)
@@ -81,7 +108,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .background(
-                        color = Color.DarkGray,
+                        color = Color.DarkGray.copy(alpha = 0.8f),
                         shape = MaterialTheme.shapes.medium
                     )
                     .padding(16.dp)
