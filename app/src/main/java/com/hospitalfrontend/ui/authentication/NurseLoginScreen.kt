@@ -9,7 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -18,8 +21,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
@@ -37,6 +43,27 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     .background(Color(0xFFE73843)),
                 contentAlignment = Alignment.TopCenter
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 1f)),
+                                    startY = size.height - 250f,
+                                    endY = size.height
+                                )
+                            )
+                        }
+                ) {
+                    GlideImage(
+                        model = R.drawable.gif,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .height(200.dp)
@@ -70,7 +97,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .background(
-                        color = Color.DarkGray,
+                        color = Color.DarkGray.copy(alpha = 0.8f),
                         shape = MaterialTheme.shapes.medium
                     )
                     .padding(16.dp)
@@ -170,16 +197,6 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     )
                 }
 
-                if (isLoginSuccess) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Login correcto",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
                 LaunchedEffect(isLoginSuccess) {
                     if (isLoginSuccess) {
                         navController.navigate("home") {

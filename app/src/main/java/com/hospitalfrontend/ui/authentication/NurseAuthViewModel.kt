@@ -30,8 +30,4 @@ class NurseAuthViewModel : ViewModel() {
         nurses.add(newNurse)
         return newNurse
     }
-
-    fun listNurses() {
-        nurses.forEach { println(it) }
-    }
 }
