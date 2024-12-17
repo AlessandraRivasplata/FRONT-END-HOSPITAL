@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
+import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -199,6 +200,9 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
 
                 LaunchedEffect(isLoginSuccess) {
                     if (isLoginSuccess) {
+                        nurseAuthViewModel.currentNurse(username.text, password.text)
+                        nurseAuthViewModel.setNurseUsername(username.text)
+                        nurseAuthViewModel.setNursePassword(password.text)
                         navController.navigate("home") {
                             popUpTo("login_nurse") { inclusive = true }
                         }

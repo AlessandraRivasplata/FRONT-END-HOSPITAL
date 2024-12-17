@@ -20,10 +20,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.hospitalfrontend.R
 import com.bumptech.glide.integration.compose.GlideImage
+import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -119,7 +121,7 @@ fun HomeScreen(navController: NavController) {
                         tint = Color.White
                     )
                     Text(
-                        text = "{Nurse Name}}",
+                        text = "Perfil",
                         color = Color.White
                     )
                 }

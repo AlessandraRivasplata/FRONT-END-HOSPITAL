@@ -34,7 +34,6 @@ fun AllNursesScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Lista de usuarios
         val nurses = listOf(
             Triple(1, "Paco Perez", "pperez"),
             Triple(2, "Pepe Rodriguez", "prodriguez"),

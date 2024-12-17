@@ -235,6 +235,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
 
                 if (isRegisterSuccess) {
                     Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         text = "Cuenta creada con éxito.",
                         color = Color.Green,

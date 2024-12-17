@@ -26,7 +26,7 @@ fun AppNavigation() {
         composable("find_nurse") { FindNurseScreen(navController) }
         composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
         composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }
-        composable("screen_nurse") { NurseInfoScreen(navController) }
+        composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
     }
 }
 
