@@ -37,6 +37,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
+            // Header Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,13 +66,6 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         contentScale = ContentScale.Crop
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .height(200.dp)
-                        .width(100.dp)
-                        .padding(top = 100.dp)
-                        .background(color = Color.White, shape = MaterialTheme.shapes.medium)
-                )
                 Image(
                     painter = painterResource(id = R.drawable.cruz_home),
                     contentDescription = "Cruz Home",
@@ -81,6 +75,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                 )
             }
 
+            // Background Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,9 +84,9 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
             )
         }
 
+        // Login Form Section
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -103,6 +98,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     )
                     .padding(16.dp)
             ) {
+                // Welcome Text
                 Text(
                     text = "Bienvenido!",
                     style = MaterialTheme.typography.headlineLarge,
@@ -113,6 +109,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         .padding(vertical = 16.dp)
                 )
 
+                // Username Field
                 TextField(
                     value = username,
                     onValueChange = {
@@ -124,9 +121,9 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     singleLine = true,
                     isError = isError,
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Password Field
                 TextField(
                     value = password,
                     onValueChange = {
@@ -151,12 +148,13 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         }
                     }
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Login Button
                 Button(
                     onClick = {
-                        if (nurseAuthViewModel.login(username.text, password.text) != null) {
+                        val nurse = nurseAuthViewModel.login(username.text, password.text)
+                        if (nurse != null) {
                             isLoginSuccess = true
                             isError = false
                         } else {
@@ -170,12 +168,11 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     Text(text = "Entrar", color = Color.White)
                 }
 
+                // Navigate to Register Screen
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .clickable {
-                            navController.navigate("register_nurse")
-                        }
+                        .clickable { navController.navigate("register_nurse") }
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 ) {
@@ -187,6 +184,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     )
                 }
 
+                // Error Message
                 if (isError) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -198,13 +196,16 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     )
                 }
 
+                // Login Success Logic
                 LaunchedEffect(isLoginSuccess) {
                     if (isLoginSuccess) {
-                        nurseAuthViewModel.currentNurse(username.text, password.text)
-                        nurseAuthViewModel.setNurseUsername(username.text)
-                        nurseAuthViewModel.setNursePassword(password.text)
-                        navController.navigate("home") {
-                            popUpTo("login_nurse") { inclusive = true }
+                        val loggedInNurse = nurseAuthViewModel.login(username.text, password.text)
+                        if (loggedInNurse != null) {
+                            nurseAuthViewModel.setNurseUsername(loggedInNurse.username)
+                            nurseAuthViewModel.setNursePassword(loggedInNurse.password)
+                            navController.navigate("home") {
+                                popUpTo("login_nurse") { inclusive = true }
+                            }
                         }
                     }
                 }
@@ -212,5 +213,3 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
         }
     }
 }
-
-

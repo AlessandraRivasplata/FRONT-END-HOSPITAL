@@ -17,16 +17,14 @@ import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 @Composable
 fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
-
     val nurseAuthViewModel: NurseAuthViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login_nurse") {
         composable("home") { HomeScreen(navController) }
-        composable("all_nurses") { AllNursesScreen(navController) }
+        composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel) }
         composable("find_nurse") { FindNurseScreen(navController) }
         composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
         composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }
         composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
     }
 }
-
