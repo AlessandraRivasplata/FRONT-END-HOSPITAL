@@ -24,7 +24,6 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
-import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -66,6 +65,13 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                         contentScale = ContentScale.Crop
                     )
                 }
+                Box(
+                    modifier = Modifier
+                        .height(200.dp)
+                        .width(100.dp)
+                        .padding(top = 100.dp)
+                        .background(color = Color.White, shape = MaterialTheme.shapes.medium)
+                )
                 Image(
                     painter = painterResource(id = R.drawable.cruz_home),
                     contentDescription = "Cruz Home",
@@ -201,6 +207,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     if (isLoginSuccess) {
                         val loggedInNurse = nurseAuthViewModel.login(username.text, password.text)
                         if (loggedInNurse != null) {
+                            nurseAuthViewModel.currentNurse(username.text, password.text)
                             nurseAuthViewModel.setNurseUsername(loggedInNurse.username)
                             nurseAuthViewModel.setNursePassword(loggedInNurse.password)
                             navController.navigate("home") {

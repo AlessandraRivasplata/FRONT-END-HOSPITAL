@@ -68,6 +68,13 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         contentScale = ContentScale.Crop
                     )
                 }
+                Box(
+                    modifier = Modifier
+                        .height(200.dp)
+                        .width(100.dp)
+                        .padding(top = 100.dp)
+                        .background(color = Color.White, shape = MaterialTheme.shapes.medium)
+                )
                 Image(
                     painter = painterResource(id = R.drawable.cruz_home),
                     contentDescription = "Cruz Home",

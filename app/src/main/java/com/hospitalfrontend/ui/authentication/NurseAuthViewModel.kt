@@ -51,6 +51,13 @@ class NurseAuthViewModel : ViewModel() {
     val nurseUsername: StateFlow<String> = _nurseUsername
     val nursePassword: StateFlow<String> = _nursePassword
 
+    fun currentNurse(username: String, password: String): String {
+        val nurse = nurses.value.find { it.username == username && it.password == password }
+        val name = nurse?.name ?: ""
+        setNurseName(name)
+        return name
+    }
+
     fun setNurseName(name: String) {
         _nurseName.value = name
     }
