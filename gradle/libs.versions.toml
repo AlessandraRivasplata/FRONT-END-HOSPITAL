@@ -15,6 +15,7 @@ animationCoreLint = "1.8.0-alpha06"
 volley = "1.2.1"
 accessibilityTestFramework = "4.1.1"
 glide = "4.15.1"
+glide-compose = "1.0.0-beta01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,7 +38,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-animation-core-lint = { group = "androidx.compose.animation", name = "animation-core-lint", version.ref = "animationCoreLint" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 accessibility-test-framework = { group = "com.google.android.apps.common.testing.accessibility.framework", name = "accessibility-test-framework", version.ref = "accessibilityTestFramework" }
-glide-compose = { module = "com.github.bumptech.glide:compose", version = "1.0.0-alpha.1" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glide-compose" }
+glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
