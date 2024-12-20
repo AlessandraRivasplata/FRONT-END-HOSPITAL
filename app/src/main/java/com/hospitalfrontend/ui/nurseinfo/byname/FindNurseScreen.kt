@@ -2,10 +2,8 @@ package com.hospitalfrontend.ui.nurseinfo.byname
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.CircleShap
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -121,14 +119,14 @@ fun FindNurseScreen(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .background(
-                        color = Color(0xFFE0E0E0).copy(alpha = 0.95f),
+                        color = Color.DarkGray.copy(alpha = 0.8f),
                         shape = MaterialTheme.shapes.medium
                     )
                     .padding(16.dp)
             ) {
                 // Search Header
                 Text(
-                    text = "Buscar Enfermero",
+                    text = "Search Nurse",
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
