@@ -5,13 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +25,6 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
 import kotlinx.coroutines.delay
-
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -90,7 +83,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         .padding(top = 100.dp)
                 )
             }
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,7 +114,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
                 )
-
                 TextField(
                     value = name,
                     onValueChange = {
@@ -134,7 +125,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     singleLine = true,
                     isError = isError,
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextField(
@@ -148,7 +138,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     singleLine = true,
                     isError = isError,
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextField(
@@ -175,7 +164,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         }
                     }
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
@@ -207,9 +195,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                         .wrapContentSize()
                         .clickable(
                             enabled = !isScreenLocked,
-                            onClick = {
-                                navController.navigate("login_nurse")
-                            }
+                            onClick = { navController.navigate("login_nurse") }
                         )
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
@@ -235,7 +221,6 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
 
                 if (isRegisterSuccess) {
                     Spacer(modifier = Modifier.height(8.dp))
-
                     Text(
                         text = "Cuenta creada con éxito.",
                         color = Color.Green,
@@ -245,7 +230,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     )
                     LaunchedEffect(key1 = isRegisterSuccess) {
                         isScreenLocked = true
-                        delay(3000) // Esperar 3 segundos
+                        delay(3000)
                         navController.navigate("login_nurse") {
                             popUpTo("login_nurse") { inclusive = true }
                         }
@@ -255,5 +240,3 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
         }
     }
 }
-
-
