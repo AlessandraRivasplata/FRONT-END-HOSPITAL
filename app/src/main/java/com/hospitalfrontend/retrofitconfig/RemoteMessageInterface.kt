@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface RemoteMessageInterface {
     @GET("/nurse/allnurses")
-    suspend fun getRemoteMessage(): NurseResponse
+    suspend fun getAllNurses(): NurseResponse
 }

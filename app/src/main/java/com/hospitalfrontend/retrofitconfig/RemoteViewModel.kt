@@ -14,7 +14,7 @@ class RemoteViewModel : ViewModel() {
     var remoteMessageUiState by mutableStateOf<RemoteMessageUiState>(RemoteMessageUiState.Cargant)
         private set
 
-    fun getRemoteMessage() {
+    fun getAllNurses() {
         viewModelScope.launch {
             remoteMessageUiState = RemoteMessageUiState.Cargant
             try {
@@ -24,7 +24,7 @@ class RemoteViewModel : ViewModel() {
                     .build()
 
                 val endPoint = connexio.create(RemoteMessageInterface::class.java)
-                val response = endPoint.getRemoteMessage()
+                val response = endPoint.getAllNurses()
 
                 remoteMessageUiState = RemoteMessageUiState.Success(response.nurses)
             } catch (e: Exception) {

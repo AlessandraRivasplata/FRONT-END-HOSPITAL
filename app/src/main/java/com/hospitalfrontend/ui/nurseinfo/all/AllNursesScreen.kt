@@ -39,7 +39,7 @@ fun AllNursesScreen(
     val remoteMessageUiState = remoteViewModel.remoteMessageUiState
     //val nurses = nurseAuthViewModel.nurses.collectAsState(initial = emptyList())
     LaunchedEffect(Unit) {
-        remoteViewModel.getRemoteMessage()
+        remoteViewModel.getAllNurses()
     }
 
     Column(
