@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +24,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.hospitalfrontend.R
+import com.hospitalfrontend.retrofitconfig.RemoteMessageUiState
+import com.hospitalfrontend.retrofitconfig.RemoteViewModel
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 
 @Composable
 fun AllNursesScreen(
     navController: NavController,
-    nurseAuthViewModel: NurseAuthViewModel
+    nurseAuthViewModel: NurseAuthViewModel,
+    remoteViewModel: RemoteViewModel
 ) {
-    val nurses = nurseAuthViewModel.nurses.collectAsState(initial = emptyList())
+    val remoteMessageUiState = remoteViewModel.remoteMessageUiState
+    //val nurses = nurseAuthViewModel.nurses.collectAsState(initial = emptyList())
+    LaunchedEffect(Unit) {
+        remoteViewModel.getAllNurses()
+    }
 
     Column(
         modifier = Modifier
@@ -66,10 +75,20 @@ fun AllNursesScreen(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                nurses.value.forEach { nurse ->
+                when (remoteMessageUiState) {
+                    is RemoteMessageUiState.Cargant -> Text("Loading... info")
+                    is RemoteMessageUiState.Error -> Text("Error")
+                    is RemoteMessageUiState.Success -> {
+                        remoteMessageUiState.remoteMessage.forEach { nurse ->
+                            //Text("ID: ${nurse.id}, Name: ${nurse.name}, Username: ${nurse.username}, Password: ${nurse.password}")
+                            NurseItem(id = nurse.id, name = nurse.name, username = nurse.username)
+                        }
+                    }
+                }
+                /*nurses.value.forEach { nurse ->
                     NurseItem(id = nurse.id, name = nurse.name, username = nurse.username)
                     Spacer(modifier = Modifier.height(12.dp))
-                }
+                }*/
             }
         }
     }
@@ -103,6 +122,7 @@ fun AllNursesScreen(
                 )
             )
         }
+
     }
 }
 

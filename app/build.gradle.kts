@@ -69,4 +69,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.lifecycle.viewmodel.ktx)
 }
