@@ -19,9 +19,9 @@ fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
     val nurseAuthViewModel: NurseAuthViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "login_nurse") {
+    NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
-        composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel) }
+        composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel, remoteViewModel = viewModel() ) }
         composable("find_nurse") { FindNurseScreen(navController, nurseAuthViewModel) }
         composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
         composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }

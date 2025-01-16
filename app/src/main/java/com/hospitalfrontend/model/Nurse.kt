@@ -7,3 +7,6 @@ data class Nurse(
     val username: String,
     val profileImage: String? = null
 )
+data class NurseResponse(
+    val nurses: List<Nurse>
+)
