@@ -12,10 +12,6 @@ import retrofit2.http.Query
 interface RemoteMessageInterface {
     @GET("/nurse/allnurses")
     suspend fun getAllNurses(): NurseResponse
-
-    @Headers("Accept: application/json","Content-Type: application/json")
-    @POST("nurse")
-    suspend fun createNurse(nurse: Nurse): NurseResponse
   
     @GET("/nurse/findnursebyname")
     suspend fun getNursesByName(@Query("name") name: String): Response<List<Nurse>>

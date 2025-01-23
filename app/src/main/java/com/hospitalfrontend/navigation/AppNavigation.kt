@@ -10,7 +10,7 @@ import com.hospitalfrontend.ui.home.HomeScreen
 import com.hospitalfrontend.ui.nurseinfo.all.AllNursesScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
-import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
+//import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 
@@ -26,7 +26,7 @@ fun AppNavigation() {
             )
         }
         composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
-        composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }
+        //composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }
         composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
     }
 }
