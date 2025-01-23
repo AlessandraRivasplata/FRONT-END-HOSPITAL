@@ -24,11 +24,14 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
+import com.hospitalfrontend.model.Nurse
+import com.hospitalfrontend.retrofitconfig.RemoteMessageUiState
+import com.hospitalfrontend.retrofitconfig.RemoteViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
+fun NurseRegisterScreen(navController: NavController, remoteViewModel: RemoteViewModel) {
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
@@ -37,6 +40,10 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
     var isScreenLocked by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+
+    // Observa el estado del ViewModel
+    val remoteMessageUiState by remoteViewModel.remoteMessageUiState.collectAsState()
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -169,14 +176,8 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                 Button(
                     onClick = {
                         if (name.text.isNotEmpty() && username.text.isNotEmpty() && password.text.isNotEmpty()) {
-                            if (nurseAuthViewModel.register(name.text, username.text, password.text) != null) {
-                                isRegisterSuccess = true
-                                isError = false
-                            } else {
-                                errorMessage = "El username ya existe"
-                                isError = true
-                                isRegisterSuccess = false
-                            }
+                            val nurse = Nurse(name = name.text, username = username.text, password = password.text)
+                            remoteViewModel.createNurse(nurse)
                         } else {
                             errorMessage = "Todos los campos son obligatorios"
                             isError = true
@@ -208,33 +209,35 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     )
                 }
 
-                if (isError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (isRegisterSuccess) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Cuenta creada con éxito.",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    LaunchedEffect(key1 = isRegisterSuccess) {
-                        isScreenLocked = true
-                        delay(3000)
-                        navController.navigate("login_nurse") {
-                            popUpTo("login_nurse") { inclusive = true }
+                when (remoteMessageUiState) {
+                    is RemoteMessageUiState.Success -> {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Cuenta creada con éxito.",
+                            color = Color.Green,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                        LaunchedEffect(key1 = remoteMessageUiState) {
+                            isScreenLocked = true
+                            delay(3000)
+                            navController.navigate("login_nurse") {
+                                popUpTo("login_nurse") { inclusive = true }
+                            }
                         }
                     }
+                    is RemoteMessageUiState.Error -> {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Hubo un error al crear la cuenta.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    else -> {}
                 }
             }
         }
