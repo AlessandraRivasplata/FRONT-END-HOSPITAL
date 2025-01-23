@@ -22,7 +22,9 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
         composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel, remoteViewModel = viewModel() ) }
-        composable("find_nurse") { FindNurseScreen(navController, nurseAuthViewModel) }
+        composable("find_nurse") { FindNurseScreen(navController = navController, nurseAuthViewModel = nurseAuthViewModel, findNurseViewModel = viewModel()
+            )
+        }
         composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
         composable("register_nurse") { NurseRegisterScreen(navController, nurseAuthViewModel) }
         composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
