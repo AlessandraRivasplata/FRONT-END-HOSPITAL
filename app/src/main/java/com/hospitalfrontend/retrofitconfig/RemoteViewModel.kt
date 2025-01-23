@@ -53,4 +53,32 @@ class RemoteViewModel : ViewModel() {
             }
         }
     }
+
+    fun findNurseByName(name: String) {
+        viewModelScope.launch {
+            remoteMessageUiState = RemoteMessageUiState.Cargant
+            try {
+                val connexio = Retrofit.Builder()
+                    .baseUrl("http://10.0.2.2:8080")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                val endPoint = connexio.create(RemoteMessageInterface::class.java)
+                val response = endPoint.getNursesByName(name)
+
+                if (response.isSuccessful) {
+                    response.body()?.let { nurses ->
+                        remoteMessageUiState = RemoteMessageUiState.Success(nurses)
+                    } ?: run {
+                        remoteMessageUiState = RemoteMessageUiState.Error
+                    }
+                } else {
+                    remoteMessageUiState = RemoteMessageUiState.Error
+                }
+            } catch (e: Exception) {
+                Log.d("exemple", "RESPOSTA ERROR ${e.message} ${e.printStackTrace()}")
+                remoteMessageUiState = RemoteMessageUiState.Error
+            }
+        }
+    }
 }
