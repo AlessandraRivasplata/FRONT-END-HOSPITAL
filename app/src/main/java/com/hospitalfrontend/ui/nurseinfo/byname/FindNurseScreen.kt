@@ -3,7 +3,9 @@ package com.hospitalfrontend.ui.nurseinfo.byname
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,24 +15,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
+import com.hospitalfrontend.ui.nurseinfo.all.NurseItem
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FindNurseScreen(
     navController: NavController,
-    nurseAuthViewModel: NurseAuthViewModel
+    nurseAuthViewModel: NurseAuthViewModel,
+    findNurseViewModel: FindNurseByNameViewModel = viewModel()
 ) {
-    val nurses = nurseAuthViewModel.nurses.collectAsState(initial = emptyList())
-    var input by remember { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<String>>(emptyList()) }
-    var error by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -87,6 +92,8 @@ fun FindNurseScreen(
                     .background(Color.Black)
             )
         }
+
+        // Back Button
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,9 +117,12 @@ fun FindNurseScreen(
                 )
             }
         }
+
         // Search Form Section
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 225.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -123,106 +133,71 @@ fun FindNurseScreen(
                         shape = MaterialTheme.shapes.medium
                     )
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                // Search Header
                 Text(
                     text = "Search Nurse",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.Black,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                        .padding(bottom = 16.dp)
                 )
 
-                // Search Input Field
                 OutlinedTextField(
-                    value = input,
-                    onValueChange = { input = it },
-                    label = { Text("Nombre o usuario") },
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = { Text("Enter nurse name", color = Color.White) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = Color.White,
+                        unfocusedLabelColor = Color.Gray
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Search Button
                 Button(
-                    onClick = {
-                        val found = nurses.value.filter { nurse ->
-                            nurse.name.contains(input, ignoreCase = true) ||
-                                    nurse.username.contains(input, ignoreCase = true)
-                        }.map { nurse -> "Id ${nurse.id}: name = ${nurse.name} | username = ${nurse.username}" }
-
-                        if (found.isNotEmpty()) {
-                            results = found
-                            error = false
-                        } else {
-                            results = emptyList()
-                            error = true
-                        }
-                    },
+                    onClick = { findNurseViewModel.findNurseByName(searchText) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Buscar", color = Color.White)
+                    Text("Search")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Display Results
-                if (results.isNotEmpty()) {
-                    Text(
-                        text = "Resultados:",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    results.forEach { result ->
-                        val details = result.split("|")
-                        val name = details[0].split("=")[1].trim()
-                        val username = details[1].split("=")[1].trim()
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.imagen_login_hospital),
-                                contentDescription = "Nurse Image",
-                                modifier = Modifier.size(64.dp)
+                when (val state = findNurseViewModel.findNurseUiState) {
+                    is FindNurseUiState.Loading -> {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                    is FindNurseUiState.Success -> {
+                        state.nurses.forEach { nurse ->
+                            NurseItem(
+                                id = nurse.id,
+                                name = nurse.name,
+                                username = nurse.username
                             )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text(
-                                    text = "Name: $name",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "Username: $username",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.Black
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
+                    is FindNurseUiState.Error -> {
+                        Text(
+                            "No nurses found or error occurred",
+                            color = Color.Red,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                    is FindNurseUiState.Initial -> {
+                        // Initial state, show nothing or instructions
+                    }
                 }
-
-                // Display Error Message
-                if (error) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "No se encontraron coincidencias.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Red,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
