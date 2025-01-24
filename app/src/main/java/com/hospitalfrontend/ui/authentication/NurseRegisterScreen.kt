@@ -28,7 +28,7 @@ import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.retrofitconfig.RemoteMessageUiState
 import com.hospitalfrontend.retrofitconfig.RemoteViewModel
 import kotlinx.coroutines.delay
-
+/*
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun NurseRegisterScreen(navController: NavController, remoteViewModel: RemoteViewModel) {
@@ -242,4 +242,4 @@ fun NurseRegisterScreen(navController: NavController, remoteViewModel: RemoteVie
             }
         }
     }
-}
+}*/
