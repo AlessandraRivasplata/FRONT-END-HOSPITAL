@@ -19,7 +19,7 @@ class RemoteViewModel : ViewModel() {
             remoteMessageUiState = RemoteMessageUiState.Cargant
             try {
                 val connexio = Retrofit.Builder()
-                    .baseUrl("http://192.168.43.219:8080") // IP Jordi 192.168.43.219  || Resto del grupo 10.0.2.2
+                    .baseUrl("http://10.0.2.2:8080") // IP Jordi 192.168.43.219  || Resto del grupo 10.0.2.2
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
@@ -39,7 +39,7 @@ class RemoteViewModel : ViewModel() {
             remoteMessageUiState = RemoteMessageUiState.Cargant
             try {
                 val connexio = Retrofit.Builder()
-                    .baseUrl("http://192.168.43.219:8080") //192.168.43.219
+                    .baseUrl("http://10.0.2.2:8080") //192.168.43.219
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
