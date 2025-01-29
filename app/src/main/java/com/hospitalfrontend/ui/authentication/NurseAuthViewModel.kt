@@ -34,7 +34,7 @@ class NurseAuthViewModel : ViewModel() {
             name = name,
             password = password,
             username = username,
-            profileImage = null
+            profileImageBytes = null
         )
 
         _nurses.value = _nurses.value + newNurse // Add the new nurse to the list

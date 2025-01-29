@@ -2,28 +2,11 @@ package com.hospitalfrontend.ui.nurseinfo.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +23,7 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
     val nurseName by nurseAuthViewModel.nurseName.collectAsState()
     val nurseUsername by nurseAuthViewModel.nurseUsername.collectAsState()
     val nursePassword by nurseAuthViewModel.nursePassword.collectAsState()
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -53,8 +37,9 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Botón de volver atras
             Button(
                 onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
@@ -71,10 +56,31 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
                     modifier = Modifier.size(24.dp)
                 )
             }
+
+            // Botón de configuración
+            Button(
+                onClick = {
+                    //Reedirigir a pantalla de config de usuario
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color(0xFFE73843), shape = CircleShape)
+                    .padding(0.dp),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.configicon),
+                    contentDescription = "Icono de Configuración",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(90.dp))
 
+        // Foto de perfil
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -89,13 +95,17 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
             )
         }
 
+        // Nombre
         Text(
             text = nurseName,
             style = MaterialTheme.typography.headlineMedium,
             color = Color.Black,
             textAlign = TextAlign.Center
         )
+
         Spacer(modifier = Modifier.height(40.dp))
+
+        // Username
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
@@ -121,6 +131,7 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Contraseña con opción de mostrar/ocultar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -131,15 +142,29 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
                     modifier = Modifier.size(24.dp),
                     tint = Color.White
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = nursePassword,
+                    text = if (isPasswordVisible) nursePassword else "********",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Black
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    painter = painterResource(
+                        id = if (isPasswordVisible) R.drawable.ojo_abierto else R.drawable.ojo_cerrado
+                    ),
+                    contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { isPasswordVisible = !isPasswordVisible },
+                    tint = Color.White
+                )
             }
         }
+
         Spacer(modifier = Modifier.height(20.dp))
+
+        // Botón de logout
         Button(
             onClick = {
                 navController.navigate("login_nurse") {
@@ -147,9 +172,11 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
                 }
                 nurseAuthViewModel.resetFields()
             },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE73843).copy(alpha = 0.8f)
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(12.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -167,6 +194,58 @@ fun NurseInfoScreen(navController: NavHostController, nurseAuthViewModel: NurseA
                 )
             }
         }
+
+        // Botón de actualizar datos de usuario
+        Button(
+            onClick = {
+                // Acción para actualizar datos de usuario
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Actualizar Datos",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White
+                )
+            }
+        }
+
+        // Botón de borrar cuenta
+        Button(
+            onClick = {
+                // Acción para borrar cuenta
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.skulldeletenurse),
+                    contentDescription = "Borrar cuenta icono",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Borrar Cuenta",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
-
