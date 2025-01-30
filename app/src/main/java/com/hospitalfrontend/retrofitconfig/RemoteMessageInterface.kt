@@ -22,4 +22,10 @@ interface RemoteMessageInterface {
     @POST("/nurse")
     suspend fun createNurse(@Body nurse: Nurse): Response<RemoteMessage>
 
+    @POST("/nurse/login")
+    suspend fun login(
+        @Query("username") username: String,
+        @Query("password") password: String
+    ): Response<Nurse>
+
 }

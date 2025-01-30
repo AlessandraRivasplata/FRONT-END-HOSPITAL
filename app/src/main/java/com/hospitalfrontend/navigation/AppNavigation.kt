@@ -12,6 +12,8 @@ import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
+import com.hospitalfrontend.ui.authentication.NurseLoginViewModel
+
 import com.hospitalfrontend.ui.authentication.NurseRegisterViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 
@@ -21,15 +23,16 @@ fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
     val nurseAuthViewModel: NurseAuthViewModel = viewModel()
     val nurseRegisterViewModel: NurseRegisterViewModel = viewModel()
+    val nurseLoginViewModel: NurseLoginViewModel = viewModel()
 
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
         composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel, remoteViewModel = viewModel() ) }
         composable("find_nurse") { FindNurseScreen(navController = navController, nurseAuthViewModel = nurseAuthViewModel, findNurseViewModel = viewModel()
-            )
+        )
         }
-        composable("login_nurse") { NurseLoginScreen(navController, nurseAuthViewModel) }
+        composable("login_nurse") { NurseLoginScreen(navController, nurseLoginViewModel) }
         composable("register_nurse") { NurseRegisterScreen(navController = navController, createNurseViewModel = nurseRegisterViewModel)
         }
         composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
