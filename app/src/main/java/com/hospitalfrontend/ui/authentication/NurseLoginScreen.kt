@@ -24,15 +24,18 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
+fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLoginViewModel) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
-    var isLoginSuccess by remember { mutableStateOf(false) }
     var isPasswordVisible by remember { mutableStateOf(false) }
+
+    // Observa el estado del NurseLoginViewModel
+    val nurseLoginUiState by nurseLoginViewModel.nurseLoginUiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -159,14 +162,7 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                 // Login Button
                 Button(
                     onClick = {
-                        val nurse = nurseAuthViewModel.login(username.text, password.text)
-                        if (nurse != null) {
-                            isLoginSuccess = true
-                            isError = false
-                        } else {
-                            isError = true
-                            isLoginSuccess = false
-                        }
+                        nurseLoginViewModel.login(username.text, password.text)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
                     modifier = Modifier.fillMaxWidth()
@@ -190,32 +186,25 @@ fun NurseLoginScreen(navController: NavController, nurseAuthViewModel: NurseAuth
                     )
                 }
 
-                // Error Message
-                if (isError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Usuario o contraseña incorrectos. Intenta nuevamente.",
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                // Login Success Logic
-                LaunchedEffect(isLoginSuccess) {
-                    if (isLoginSuccess) {
-                        val loggedInNurse = nurseAuthViewModel.login(username.text, password.text)
-                        if (loggedInNurse != null) {
-                            nurseAuthViewModel.currentNurse(username.text, password.text)
-                            nurseAuthViewModel.setNurseUsername(loggedInNurse.username)
-                            nurseAuthViewModel.setNursePassword(loggedInNurse.password)
-                            navController.navigate("home") {
-                                popUpTo("login_nurse") { inclusive = true }
-                            }
+                // Observa el estado de la UI
+                when (nurseLoginUiState) {
+                    is NurseLoginUiState.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    is NurseLoginUiState.Success -> {
+                        Text(text = "Login exitoso", color = Color.Green, modifier = Modifier.align(Alignment.CenterHorizontally))
+                        LaunchedEffect(Unit) {
+                            delay(2000) // Esperar 2 segundos antes de navegar
+                            navController.navigate("home") // Navegar a la pantalla principal
                         }
                     }
+                    is NurseLoginUiState.Error -> {
+                        Text(text = "Error de login", color = Color.Red, modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    else -> {}
                 }
+
+                // Error Message (este puede eliminarse si ya estás observando `nurseLoginUiState`)
             }
         }
     }
