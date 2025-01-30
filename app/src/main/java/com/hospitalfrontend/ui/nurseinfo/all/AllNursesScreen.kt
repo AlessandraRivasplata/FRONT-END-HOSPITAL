@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -151,10 +152,9 @@ fun AllNursesScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 when (remoteMessageUiState) {
-                    is RemoteMessageUiState.Cargant -> Text(
-                        "Loading...",
-                        color = Color(0xFFF4F4F6),
-                        style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
+                    is RemoteMessageUiState.Cargant -> CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     is RemoteMessageUiState.Error -> Text(
                         "Error",
