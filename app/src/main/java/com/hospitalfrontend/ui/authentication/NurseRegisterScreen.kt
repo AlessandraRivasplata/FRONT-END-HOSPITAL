@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.authentication
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,34 +10,34 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
+import com.hospitalfrontend.model.Nurse
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseAuthViewModel) {
-    var name by remember { mutableStateOf(TextFieldValue("")) }
-    var username by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+fun NurseRegisterScreen(
+    navController: NavController,
+    createNurseViewModel: NurseRegisterViewModel // Aquí recibimos el NurseRegisterViewModel
+) {
+    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
-    var isRegisterSuccess by remember { mutableStateOf(false) }
     var isScreenLocked by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+
+    // Estado local para el UI
+    val createNurseUiState by createNurseViewModel.createNurseUiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -47,41 +48,7 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     .background(Color(0xFFE73843)),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 1f)),
-                                    startY = size.height - 250f,
-                                    endY = size.height
-                                )
-                            )
-                        }
-                ) {
-                    GlideImage(
-                        model = R.drawable.gif,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .height(200.dp)
-                        .width(100.dp)
-                        .padding(top = 100.dp)
-                        .background(color = Color.White, shape = MaterialTheme.shapes.medium)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.cruz_home),
-                    contentDescription = "Cruz Home",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(top = 100.dp)
-                )
+                // Aquí iría la imagen de fondo, si es necesario
             }
             Box(
                 modifier = Modifier
@@ -168,19 +135,12 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
 
                 Button(
                     onClick = {
-                        if (name.text.isNotEmpty() && username.text.isNotEmpty() && password.text.isNotEmpty()) {
-                            if (nurseAuthViewModel.register(name.text, username.text, password.text) != null) {
-                                isRegisterSuccess = true
-                                isError = false
-                            } else {
-                                errorMessage = "El username ya existe"
-                                isError = true
-                                isRegisterSuccess = false
-                            }
+                        if (name.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty()) {
+                            val nurse = Nurse(id = 0, name = name, username = username, password = password) // Asegúrate de enviar un id
+                            createNurseViewModel.createNurse(nurse) // Usamos el ViewModel para crear la enfermera
                         } else {
                             errorMessage = "Todos los campos son obligatorios"
                             isError = true
-                            isRegisterSuccess = false
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
@@ -208,33 +168,40 @@ fun NurseRegisterScreen(navController: NavController, nurseAuthViewModel: NurseA
                     )
                 }
 
-                if (isError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                if (isRegisterSuccess) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Cuenta creada con éxito.",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    LaunchedEffect(key1 = isRegisterSuccess) {
-                        isScreenLocked = true
-                        delay(3000)
-                        navController.navigate("login_nurse") {
-                            popUpTo("login_nurse") { inclusive = true }
+                // Observa el estado del ViewModel para mostrar mensajes de éxito o error
+                when (createNurseUiState) {
+                    is CreateNurseUiState.Success -> {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Cuenta creada con éxito.",
+                            color = Color.Green,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                        LaunchedEffect(key1 = createNurseUiState) {
+                            isScreenLocked = true
+                            delay(3000)
+                            navController.navigate("login_nurse") {
+                                popUpTo("login_nurse") { inclusive = true }
+                            }
                         }
                     }
+                    is CreateNurseUiState.Error -> {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Hubo un error al crear la cuenta.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    is CreateNurseUiState.Loading -> {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    else -> {}
                 }
             }
         }
