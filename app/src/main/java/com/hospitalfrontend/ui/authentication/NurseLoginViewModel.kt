@@ -22,13 +22,15 @@ class NurseLoginViewModel : ViewModel() {
     private val _nurseLoginUiState = MutableStateFlow<NurseLoginUiState>(NurseLoginUiState.Initial)
     val nurseLoginUiState: StateFlow<NurseLoginUiState> = _nurseLoginUiState
 
-    fun login(username: String, password: String): String? {
-        var message: String? = null
+    private val _nurse = MutableStateFlow<Nurse?>(null)
+    val nurse: StateFlow<Nurse?> = _nurse
+
+    fun login(username: String, password: String) {
         viewModelScope.launch {
             _nurseLoginUiState.value = NurseLoginUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8081")
+                    .baseUrl("http://192.168.43.219:8080")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
@@ -36,18 +38,15 @@ class NurseLoginViewModel : ViewModel() {
                 val response = endpoint.login(username, password)
 
                 if (response.isSuccessful) {
-                    message = "Login exitoso"
+                    _nurse.value = response.body() //Variable donde esta la info de la nurse
                     _nurseLoginUiState.value = NurseLoginUiState.Success
                 } else {
-                    message = "Error: ${response.errorBody()?.string()}"
                     _nurseLoginUiState.value = NurseLoginUiState.Error
                 }
             } catch (e: Exception) {
                 Log.d("NurseLogin", "Error: ${e.message}")
-                message = "Error: ${e.message}"
                 _nurseLoginUiState.value = NurseLoginUiState.Error
             }
         }
-        return message
     }
 }
