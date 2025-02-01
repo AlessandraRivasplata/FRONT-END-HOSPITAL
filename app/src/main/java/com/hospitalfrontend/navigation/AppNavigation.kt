@@ -34,7 +34,7 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "login_nurse") {
         composable("home") { HomeScreen(navController) }
         composable("all_nurses") {
             AllNursesScreen(
