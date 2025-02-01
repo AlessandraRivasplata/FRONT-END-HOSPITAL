@@ -2,52 +2,44 @@ package com.hospitalfrontend.ui.nurseinfo.all
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.google.gson.Gson
 import com.hospitalfrontend.R
 import com.hospitalfrontend.retrofitconfig.RemoteMessageUiState
 import com.hospitalfrontend.retrofitconfig.RemoteViewModel
-import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AllNursesScreen(
     navController: NavController,
-    nurseAuthViewModel: NurseAuthViewModel,
-    remoteViewModel: RemoteViewModel
+    remoteViewModel: RemoteViewModel,
 ) {
     val remoteMessageUiState = remoteViewModel.remoteMessageUiState
     LaunchedEffect(Unit) {
@@ -151,10 +143,9 @@ fun AllNursesScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 when (remoteMessageUiState) {
-                    is RemoteMessageUiState.Cargant -> Text(
-                        "Loading...",
-                        color = Color(0xFFF4F4F6),
-                        style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
+                    is RemoteMessageUiState.Cargant -> CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     is RemoteMessageUiState.Error -> Text(
                         "Error",
@@ -163,7 +154,7 @@ fun AllNursesScreen(
                     )
                     is RemoteMessageUiState.Success -> {
                         remoteMessageUiState.remoteMessage.forEach { nurse ->
-                            NurseItem(id = nurse.id, name = nurse.name, username = nurse.username)
+                            NurseItem(id = nurse.id, name = nurse.name, username = nurse.username, navController)
                             Spacer(modifier = Modifier.height(12.dp))
                         }
                     }
@@ -176,15 +167,21 @@ fun AllNursesScreen(
 
 
 @Composable
-fun NurseItem(id: Int, name: String, username: String) {
+fun NurseItem(id: Int, name: String, username: String, navController: NavController) {
+    var idnurse = 0
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(
                 color = Color(0xFF3D3D5C).copy(alpha = 0.8f),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp)
             )
+            .clickable {
+                idnurse = id
+                navController.navigate("findbyid_nurse/$id")
+            }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -193,7 +190,7 @@ fun NurseItem(id: Int, name: String, username: String) {
                 .size(64.dp)
                 .background(
                     color = Color(0xFFEA4646),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
         ) {
             Image(
@@ -201,7 +198,7 @@ fun NurseItem(id: Int, name: String, username: String) {
                 contentDescription = "Imagen de usuario",
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
             )
         }
 
@@ -232,6 +229,10 @@ fun NurseItem(id: Int, name: String, username: String) {
         }
     }
 }
+
+
+
+
 
 
 

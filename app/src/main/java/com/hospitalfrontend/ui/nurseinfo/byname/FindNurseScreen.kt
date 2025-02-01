@@ -182,7 +182,8 @@ fun FindNurseScreen(
                             NurseItem(
                                 id = nurse.id,
                                 name = nurse.name,
-                                username = nurse.username
+                                username = nurse.username,
+                                navController
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }

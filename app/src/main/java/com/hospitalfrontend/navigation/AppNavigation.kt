@@ -15,7 +15,12 @@ import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.authentication.NurseLoginViewModel
 
 import com.hospitalfrontend.ui.authentication.NurseRegisterViewModel
+import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdScreen
+import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdViewModel
+import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
+import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
+import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
 
 
 @Composable
@@ -24,17 +29,58 @@ fun AppNavigation() {
     val nurseAuthViewModel: NurseAuthViewModel = viewModel()
     val nurseRegisterViewModel: NurseRegisterViewModel = viewModel()
     val nurseLoginViewModel: NurseLoginViewModel = viewModel()
+    val deleteNurseViewModel: DeleteNurseViewModel = viewModel()
+    val updateNurseViewModel: UpdateNurseViewModel = viewModel()
+    val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController) }
-        composable("all_nurses") { AllNursesScreen(navController, nurseAuthViewModel, remoteViewModel = viewModel() ) }
-        composable("find_nurse") { FindNurseScreen(navController = navController, nurseAuthViewModel = nurseAuthViewModel, findNurseViewModel = viewModel()
-        )
+        composable("all_nurses") {
+            AllNursesScreen(
+                navController,
+                remoteViewModel = viewModel(),
+            )
         }
-        composable("login_nurse") { NurseLoginScreen(navController, nurseLoginViewModel) }
-        composable("register_nurse") { NurseRegisterScreen(navController = navController, createNurseViewModel = nurseRegisterViewModel)
+        composable("find_nurse") {
+            FindNurseScreen(
+                navController = navController,
+                nurseAuthViewModel = nurseAuthViewModel,
+                findNurseViewModel = viewModel()
+            )
         }
-        composable("screen_nurse") { NurseInfoScreen(navController, nurseAuthViewModel) }
+        composable("login_nurse") {
+            NurseLoginScreen(navController, nurseLoginViewModel)
+        }
+        composable("register_nurse") {
+            NurseRegisterScreen(
+                navController = navController,
+                createNurseViewModel = nurseRegisterViewModel
+            )
+        }
+        composable("screen_nurse") {
+            NurseInfoScreen(
+                navController,
+                nurseAuthViewModel,
+                nurseLoginViewModel,
+                deleteNurseViewModel
+            )
+        }
+        composable("update_nurse") {
+            UpdateNurseScreen(
+                navController,
+                updateNurseViewModel,
+                nurseLoginViewModel
+            )
+        }
+        composable("findbyid_nurse/{id}") {
+            backStackEntry -> val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+            FindNurseByIdScreen(
+                navController,
+                findNurseByIdViewModel,
+                id
+            )
+        }
+
     }
 }

@@ -12,6 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 sealed interface NurseLoginUiState {
+    object Idle : NurseLoginUiState
     object Success : NurseLoginUiState
     object Error : NurseLoginUiState
     object Loading : NurseLoginUiState
@@ -24,6 +25,24 @@ class NurseLoginViewModel : ViewModel() {
 
     private val _nurse = MutableStateFlow<Nurse?>(null)
     val nurse: StateFlow<Nurse?> = _nurse
+
+    fun setName(name: String) {
+        _nurse.value?.let {
+            _nurse.value = it.copy(name = name)
+        }
+    }
+
+    fun setUsername(username: String) {
+        _nurse.value?.let {
+            _nurse.value = it.copy(username = username)
+        }
+    }
+
+    fun setPassword(password: String) {
+        _nurse.value?.let {
+            _nurse.value = it.copy(password = password)
+        }
+    }
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
@@ -39,6 +58,7 @@ class NurseLoginViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     _nurse.value = response.body() //Variable donde esta la info de la nurse
+                    Log.d("NurseLogin", "Nurse logged in: ${_nurse.value}")
                     _nurseLoginUiState.value = NurseLoginUiState.Success
                 } else {
                     _nurseLoginUiState.value = NurseLoginUiState.Error
@@ -48,5 +68,11 @@ class NurseLoginViewModel : ViewModel() {
                 _nurseLoginUiState.value = NurseLoginUiState.Error
             }
         }
+    }
+    fun clearNurse() {
+        _nurse.value = null
+    }
+    fun resetLoginState() {
+        _nurseLoginUiState.value = NurseLoginUiState.Idle
     }
 }
