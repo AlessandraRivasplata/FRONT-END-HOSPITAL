@@ -17,7 +17,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.model.Nurse
@@ -26,7 +25,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun NurseRegisterScreen(
     navController: NavController,
-    createNurseViewModel: NurseRegisterViewModel // Aquí recibimos el NurseRegisterViewModel
+    createNurseViewModel: NurseRegisterViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
@@ -36,8 +35,11 @@ fun NurseRegisterScreen(
     var errorMessage by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // Estado local para el UI
     val createNurseUiState by createNurseViewModel.createNurseUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        createNurseViewModel.resetRegisterState()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -47,20 +49,17 @@ fun NurseRegisterScreen(
                     .weight(1f)
                     .background(Color(0xFFE73843)),
                 contentAlignment = Alignment.TopCenter
-            ) {
-                // Aquí iría la imagen de fondo, si es necesario
-            }
+            ) {}
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .background(Color.Black)
-            )
+            ) {}
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -77,42 +76,29 @@ fun NurseRegisterScreen(
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.White,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
                 )
                 TextField(
                     value = name,
-                    onValueChange = {
-                        name = it
-                        isError = false
-                    },
+                    onValueChange = { name = it; isError = false },
                     label = { Text("Nombre") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = isError,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-
                 TextField(
                     value = username,
-                    onValueChange = {
-                        username = it
-                        isError = false
-                    },
+                    onValueChange = { username = it; isError = false },
                     label = { Text("Usuario") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = isError,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-
                 TextField(
                     value = password,
-                    onValueChange = {
-                        password = it
-                        isError = false
-                    },
+                    onValueChange = { password = it; isError = false },
                     label = { Text("Contraseña") },
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -132,12 +118,11 @@ fun NurseRegisterScreen(
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Button(
                     onClick = {
                         if (name.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty()) {
-                            val nurse = Nurse(id = 0, name = name, username = username, password = password) // Asegúrate de enviar un id
-                            createNurseViewModel.createNurse(nurse) // Usamos el ViewModel para crear la enfermera
+                            val nurse = Nurse(id = 0, name = name, username = username, password = password)
+                            createNurseViewModel.createNurse(nurse)
                         } else {
                             errorMessage = "Todos los campos son obligatorios"
                             isError = true
@@ -149,14 +134,10 @@ fun NurseRegisterScreen(
                 ) {
                     Text(text = "Crear Cuenta", color = Color.White)
                 }
-
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .clickable(
-                            enabled = !isScreenLocked,
-                            onClick = { navController.navigate("login_nurse") }
-                        )
+                        .clickable(enabled = !isScreenLocked, onClick = { navController.navigate("login_nurse") })
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 10.dp)
                 ) {
@@ -167,8 +148,6 @@ fun NurseRegisterScreen(
                         textAlign = TextAlign.Center,
                     )
                 }
-
-                // Observa el estado del ViewModel para mostrar mensajes de éxito o error
                 when (createNurseUiState) {
                     is CreateNurseUiState.Success -> {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -179,7 +158,7 @@ fun NurseRegisterScreen(
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
-                        LaunchedEffect(key1 = createNurseUiState) {
+                        LaunchedEffect(Unit) {
                             isScreenLocked = true
                             delay(3000)
                             navController.navigate("login_nurse") {

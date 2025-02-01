@@ -12,6 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 sealed interface CreateNurseUiState {
+    object Idle : CreateNurseUiState
     object Success : CreateNurseUiState
     object Error : CreateNurseUiState
     object Loading : CreateNurseUiState
@@ -49,5 +50,8 @@ class NurseRegisterViewModel : ViewModel() {
             }
         }
         return message
+    }
+    fun resetRegisterState() {
+        _createNurseUiState.value = CreateNurseUiState.Idle
     }
 }

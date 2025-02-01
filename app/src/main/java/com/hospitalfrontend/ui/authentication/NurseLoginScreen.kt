@@ -34,8 +34,11 @@ fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLog
     var isError by remember { mutableStateOf(false) }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // Observa el estado del NurseLoginViewModel
     val nurseLoginUiState by nurseLoginViewModel.nurseLoginUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        nurseLoginViewModel.resetLoginState()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -185,8 +188,6 @@ fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLog
                         textAlign = TextAlign.Center
                     )
                 }
-
-                // Observa el estado de la UI
                 when (nurseLoginUiState) {
                     is NurseLoginUiState.Loading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -194,8 +195,8 @@ fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLog
                     is NurseLoginUiState.Success -> {
                         Text(text = "Login exitoso", color = Color.Green, modifier = Modifier.align(Alignment.CenterHorizontally))
                         LaunchedEffect(Unit) {
-                            delay(2000) // Esperar 2 segundos antes de navegar
-                            navController.navigate("home") // Navegar a la pantalla principal
+                            delay(2000)
+                            navController.navigate("home")
                         }
                     }
                     is NurseLoginUiState.Error -> {
@@ -203,8 +204,6 @@ fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLog
                     }
                     else -> {}
                 }
-
-                // Error Message (este puede eliminarse si ya estás observando `nurseLoginUiState`)
             }
         }
     }
