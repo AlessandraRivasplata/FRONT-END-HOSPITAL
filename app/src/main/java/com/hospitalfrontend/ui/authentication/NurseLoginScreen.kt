@@ -2,207 +2,112 @@ package com.hospitalfrontend.ui.authentication
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.hospitalfrontend.R
-import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLoginViewModel) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
-    var isPasswordVisible by remember { mutableStateOf(false) }
 
-    val nurseLoginUiState by nurseLoginViewModel.nurseLoginUiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        nurseLoginViewModel.resetLoginState()
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Header Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color(0xFFE73843)),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 1f)),
-                                    startY = size.height - 250f,
-                                    endY = size.height
-                                )
-                            )
-                        }
-                ) {
-                    GlideImage(
-                        model = R.drawable.gif,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .height(200.dp)
-                        .width(100.dp)
-                        .padding(top = 100.dp)
-                        .background(color = Color.White, shape = MaterialTheme.shapes.medium)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.cruz_home),
-                    contentDescription = "Cruz Home",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(top = 100.dp)
-                )
-            }
-
-            // Background Section
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color.Black)
-            )
-        }
-
-        // Login Form Section
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF2F2F2)), // Fondo más suave
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(0.85f),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp), // Elevación más sutil
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .background(
-                        color = Color.DarkGray.copy(alpha = 0.8f),
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .padding(16.dp)
+                modifier = Modifier.padding(32.dp), // Padding más generoso
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Welcome Text
+                // Logo
+                Image(
+                    painter = painterResource(id = R.drawable.logo_hospitex),
+                    contentDescription = "LOGO HOSPITEX",
+                    modifier = Modifier.size(200.dp) // Tamaño ajustado
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // Título
                 Text(
                     text = "Bienvenido!",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2C3E50), // Color más elegante
+                    textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Username Field
-                TextField(
+                OutlinedTextField(
                     value = username,
                     onValueChange = {
                         username = it
                         isError = false
                     },
                     label = { Text("Usuario") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .height(70.dp), // Aumenta la altura del campo de texto
                     singleLine = true,
                     isError = isError,
+                    shape = RoundedCornerShape(0.dp), // Bordes cuadrados
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = Color(0xFFF6F6F6),
+                        focusedBorderColor = Color(0xFF4A90E2),
+                        unfocusedBorderColor = Color(0xFFBDC3C7)
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp // Aumenta el tamaño de la fuente dentro del TextField
+                    )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                // Password Field
-                TextField(
-                    value = password,
-                    onValueChange = {
-                        password = it
-                        isError = false
-                    },
-                    label = { Text("Contraseña") },
-                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    isError = isError,
-                    trailingIcon = {
-                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (isPasswordVisible) R.drawable.ojo_abierto else R.drawable.ojo_cerrado
-                                ),
-                                contentDescription = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Login Button
                 Button(
                     onClick = {
-                        nurseLoginViewModel.login(username.text, password.text)
+                        if (username.text.isEmpty()) {
+                            isError = true
+                        } else {
+                            // Aquí va la lógica de autenticación
+                        }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE73843)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Entrar", color = Color.White)
-                }
-
-                // Navigate to Register Screen
-                Box(
                     modifier = Modifier
-                        .wrapContentSize()
-                        .clickable { navController.navigate("register_nurse") }
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 10.dp)
+                        .fillMaxWidth()
+                        .height(56.dp), // Botón de mayor altura
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF78C9E4)) // Botón azul
                 ) {
                     Text(
-                        text = "¿No tienes cuenta?",
-                        style = MaterialTheme.typography.bodyLarge,
+                        text = "Entrar",
                         color = Color.White,
-                        textAlign = TextAlign.Center
+                        fontSize = 18.sp, // Texto más grande para el botón
+                        fontWeight = FontWeight.Bold
                     )
-                }
-                when (nurseLoginUiState) {
-                    is NurseLoginUiState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    }
-                    is NurseLoginUiState.Success -> {
-                        Text(text = "Login exitoso", color = Color.Green, modifier = Modifier.align(Alignment.CenterHorizontally))
-                        LaunchedEffect(Unit) {
-                            delay(2000)
-                            navController.navigate("home")
-                        }
-                    }
-                    is NurseLoginUiState.Error -> {
-                        Text(text = "Error de login", color = Color.Red, modifier = Modifier.align(Alignment.CenterHorizontally))
-                    }
-                    else -> {}
                 }
             }
         }
