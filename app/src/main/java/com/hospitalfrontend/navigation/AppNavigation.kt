@@ -13,7 +13,6 @@ import com.hospitalfrontend.ui.authentication.NurseLoginScreen
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.authentication.NurseLoginViewModel
-
 import com.hospitalfrontend.ui.authentication.NurseRegisterViewModel
 import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdScreen
 import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdViewModel
@@ -21,6 +20,7 @@ import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
+import com.hospitalfrontend.ui.rooms.ListRoomScreen
 import com.hospitalfrontend.ui.profile.PersonalDataScreen
 
 @Composable
@@ -69,13 +69,15 @@ fun AppNavigation() {
             )
         }
         composable("findbyid_nurse/{id}") {
-            backStackEntry -> val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+                backStackEntry -> val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
             FindNurseByIdScreen(
                 navController,
                 findNurseByIdViewModel,
                 id
             )
         }
-
+        composable("list_rooms") {
+            ListRoomScreen(navController)
+        }
     }
 }
