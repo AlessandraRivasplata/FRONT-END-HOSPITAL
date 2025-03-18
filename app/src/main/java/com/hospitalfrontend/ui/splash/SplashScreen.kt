@@ -64,7 +64,7 @@ fun SplashScreenContent() {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.cruz_home),
+                    painter = painterResource(id = R.drawable.logo_hospitex),
                     contentDescription = "Logo",
                     modifier = Modifier.size(135.dp)
                 )
