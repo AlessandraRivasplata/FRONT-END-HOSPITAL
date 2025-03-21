@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
 import com.hospitalfrontend.ui.nurseinfo.all.AllNursesScreen
+import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
@@ -34,8 +35,9 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
-    NavHost(navController = navController, startDestination = "personal_data") {
-        composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
+    NavHost(navController = navController, startDestination = "medical_data") {
+        //composable("personal_data") { PersonalDataScreen(navController = navController) }
+        composable("medical_data") { MedicalDataScreen(navController = navController) }
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
@@ -78,6 +80,9 @@ fun AppNavigation() {
         }
         composable("list_rooms") {
             ListRoomScreen(navController)
+        }
+        composable("medical_data") {
+            MedicalDataScreen(navController)
         }
     }
 }
