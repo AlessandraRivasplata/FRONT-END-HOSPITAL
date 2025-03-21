@@ -26,38 +26,20 @@ class NurseLoginViewModel : ViewModel() {
     private val _nurse = MutableStateFlow<Nurse?>(null)
     val nurse: StateFlow<Nurse?> = _nurse
 
-    fun setName(name: String) {
-        _nurse.value?.let {
-            _nurse.value = it.copy(name = name)
-        }
-    }
-
-    fun setUsername(username: String) {
-        _nurse.value?.let {
-            _nurse.value = it.copy(username = username)
-        }
-    }
-
-    fun setPassword(password: String) {
-        _nurse.value?.let {
-            _nurse.value = it.copy(password = password)
-        }
-    }
-
-    fun login(username: String, password: String) {
+    fun login(nurseNumber: Int) {
         viewModelScope.launch {
             _nurseLoginUiState.value = NurseLoginUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://192.168.43.219:8080")
+                    .baseUrl("http://10.118.0.51:8080") //ip del servidor springboot
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
                 val endpoint = connection.create(RemoteMessageInterface::class.java)
-                val response = endpoint.login(username, password)
+                val response = endpoint.login(nurseNumber)
 
                 if (response.isSuccessful) {
-                    _nurse.value = response.body() //Variable donde esta la info de la nurse
+                    _nurse.value = response.body() // Variable where the nurse's info is stored
                     Log.d("NurseLogin", "Nurse logged in: ${_nurse.value}")
                     _nurseLoginUiState.value = NurseLoginUiState.Success
                 } else {
@@ -69,9 +51,11 @@ class NurseLoginViewModel : ViewModel() {
             }
         }
     }
+
     fun clearNurse() {
         _nurse.value = null
     }
+
     fun resetLoginState() {
         _nurseLoginUiState.value = NurseLoginUiState.Idle
     }

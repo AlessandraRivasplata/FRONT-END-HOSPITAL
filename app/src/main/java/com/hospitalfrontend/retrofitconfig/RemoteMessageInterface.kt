@@ -30,8 +30,7 @@ interface RemoteMessageInterface {
 
     @POST("/nurse/login")
     suspend fun login(
-        @Query("username") username: String,
-        @Query("password") password: String
+        @Query("nurseNumber") nurseNumber: Int
     ): Response<Nurse>
 
     @DELETE("nurse/{id}")
