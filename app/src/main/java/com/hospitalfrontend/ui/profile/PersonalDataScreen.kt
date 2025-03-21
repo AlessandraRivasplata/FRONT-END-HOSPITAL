@@ -44,29 +44,21 @@ fun PersonalDataScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
-                    // Imagen en el menú
                     Image(
-                        painter = painterResource(id = R.drawable.medico_menu), // Reemplaza con tu imagen
+                        painter = painterResource(id = R.drawable.medico_menu),
                         contentDescription = "Imagen del menú",
                         modifier = Modifier.size(150.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Nombre de usuario
                     Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-
-                    // Opciones del menú
                     DrawerItem("Datos Médicos") { navController.navigate("medical_data") }
                     DrawerItem("Datos Personales") { navController.navigate("personal_data") }
                     DrawerItem("Datos de Cuidado") { navController.navigate("care_data") }
-
                     Spacer(modifier = Modifier.weight(1f))
-
-                    // Icono de salir
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.log_out_icono), // Reemplaza con el icono de salida
+                            painter = painterResource(id = R.drawable.log_out_icono),
                             contentDescription = "Salir",
                             modifier = Modifier.size(40.dp),
                             tint = Color.Unspecified
@@ -94,8 +86,8 @@ fun PersonalDataScreen(navController: NavController) {
                     },
                     navigationIcon = {
                         Row(
-                            horizontalArrangement = Arrangement.Start, // Alineación horizontal
-                            verticalAlignment = Alignment.CenterVertically // Alineación vertical
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
@@ -105,7 +97,7 @@ fun PersonalDataScreen(navController: NavController) {
                                     tint = Color.Unspecified
                                 )
                             }
-                            Spacer(modifier = Modifier.width(16.dp)) // Espacio entre los iconos
+                            Spacer(modifier = Modifier.width(16.dp))
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.menu_icono),
@@ -191,4 +183,3 @@ fun DrawerItem(text: String, onClick: () -> Unit) {
             .padding(16.dp)
     )
 }
-
