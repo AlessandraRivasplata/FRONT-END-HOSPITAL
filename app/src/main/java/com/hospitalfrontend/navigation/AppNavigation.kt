@@ -35,7 +35,7 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
-    NavHost(navController = navController, startDestination = "medical_data") {
+    NavHost(navController = navController, startDestination = "list_rooms") {
         //composable("personal_data") { PersonalDataScreen(navController = navController) }
         composable("medical_data") { MedicalDataScreen(navController = navController) }
         composable("home") { HomeScreen(navController) }
