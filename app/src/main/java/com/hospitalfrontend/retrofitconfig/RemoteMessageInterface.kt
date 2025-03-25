@@ -3,6 +3,7 @@ package com.hospitalfrontend.retrofitconfig
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
 import com.hospitalfrontend.model.RemoteMessage
+import com.hospitalfrontend.model.RoomResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -44,5 +45,6 @@ interface RemoteMessageInterface {
         @Query("password") password: String
     ): Response<Unit>
 
-
+    @GET("/room/all")
+    suspend fun getAllRooms(): Response<RoomResponse>
 }
