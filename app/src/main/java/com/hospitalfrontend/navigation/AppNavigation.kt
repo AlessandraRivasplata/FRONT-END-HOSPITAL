@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
-import com.hospitalfrontend.ui.nurseinfo.all.AllNursesScreen
+import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
@@ -22,7 +22,13 @@ import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
 import com.hospitalfrontend.ui.profile.CareDataScreen
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
-import com.hospitalfrontend.ui.profile.PersonalDataScreen
+import com.hospitalfrontend.ui.patients.ListPatients
+ 58-create-care-data-page
+import com.hospitalfrontend.ui.profile.CareDataScreen
+
+
+ main
+
 
 @Composable
 fun AppNavigation() {
@@ -35,9 +41,12 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
+ 58-create-care-data-page
     NavHost(navController = navController, startDestination = "care_data") {
         composable("care_data") { CareDataScreen(navController = navController) }
         composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
+
+ main
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
@@ -80,6 +89,13 @@ fun AppNavigation() {
         }
         composable("list_rooms") {
             ListRoomScreen(navController)
+        }
+        composable("medical_data") {
+            MedicalDataScreen(navController)
+        }
+        composable("list_patients/{roomNumber}") { backStackEntry ->
+            val roomNumber = backStackEntry.arguments?.getString("roomNumber")
+            ListPatients(navController, roomNumber)
         }
     }
 }

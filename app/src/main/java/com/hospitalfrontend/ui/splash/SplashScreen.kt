@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.hospitalfrontend.MainActivity
@@ -49,26 +50,31 @@ class SplashScreen : ComponentActivity() {
 fun SplashScreenContent() {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        // Imagen de fondo que ocupa toda la pantalla
+        Image(
+            painter = painterResource(id = R.drawable.wife_visiting_her_ill_husband),
+            contentDescription = "Esposa visitando a su esposo enfermo",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // Logo circular centrado
+        Box(
+            modifier = Modifier
+                .size(160.dp)
+                .clip(CircleShape)
+                .background(Color.White),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(160.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_hospitex),
-                    contentDescription = "Logo",
-                    modifier = Modifier.size(135.dp)
-                )
-            }
+            Image(
+                painter = painterResource(id = R.drawable.logo_hospitex),
+                contentDescription = "Logo",
+                modifier = Modifier.size(135.dp)
+            )
         }
     }
 }
+

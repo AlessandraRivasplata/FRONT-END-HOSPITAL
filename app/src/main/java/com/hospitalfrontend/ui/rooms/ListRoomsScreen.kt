@@ -4,9 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,11 +16,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
+import com.hospitalfrontend.model.Room
 
 @Composable
-fun ListRoomScreen(navController: NavController) {
+fun ListRoomScreen(navController: NavController, listRoomsViewModel: ListRoomsViewModel = viewModel()) {
+    val roomsUiState by listRoomsViewModel.roomsUiState.collectAsState()
+    val rooms by listRoomsViewModel.rooms.collectAsState()
+
+    LaunchedEffect(Unit) {
+        listRoomsViewModel.getAllRooms()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,17 +40,20 @@ fun ListRoomScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.hospital_bed_2775552),
             contentDescription = "LOGO ROOM",
-            modifier = Modifier.size(150.dp) // Tamaño ajustado
+            modifier = Modifier.size(150.dp)
         )
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 80.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(0.85f),
+                    .fillMaxWidth(0.85f)
+                    .heightIn(max = 700.dp),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -56,12 +70,32 @@ fun ListRoomScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    val rooms = listOf("101", "102", "103", "104")
-                    rooms.forEach { roomNumber ->
-                        RoomItem(roomNumber = roomNumber, onClick = {
-                            // Navegación o lógica al seleccionar la habitación
-                        })
-                        Spacer(modifier = Modifier.height(8.dp))
+                    when (roomsUiState) {
+                        is RoomsUiState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is RoomsUiState.Success -> {
+                            LazyColumn(
+                                contentPadding = PaddingValues(vertical = 8.dp),
+                                modifier = Modifier.heightIn(max = 550.dp)
+                            ) {
+                                items(rooms) { room ->
+                                    RoomItem(room = room, onClick = {
+                                        navController.navigate("list_patients/${room.roomNumber}")
+                                    })
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                        }
+                        is RoomsUiState.Error -> {
+                            Text(
+                                text = "Error al cargar las habitaciones",
+                                color = Color.Red,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        else -> {}
                     }
                 }
             }
@@ -70,7 +104,7 @@ fun ListRoomScreen(navController: NavController) {
 }
 
 @Composable
-fun RoomItem(roomNumber: String, onClick: () -> Unit) {
+fun RoomItem(room: Room, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,17 +113,23 @@ fun RoomItem(roomNumber: String, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF78C9E4))
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 8.dp, horizontal = 16.dp)
                 .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Habitación $roomNumber",
+                text = "Habitación ${room.roomNumber}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
+            )
+            Text(
+                text = "Piso ${room.floor}",
+                fontSize = 18.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold,
             )
         }
     }

@@ -243,7 +243,7 @@ fun UpdateNurseScreen(
             }
         }
     }
-
+/*
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -269,4 +269,5 @@ fun UpdateNurseScreen(
             text = { Text("¿Estás seguro de que quieres actualizar estos datos?") }
         )
     }
+    */
 }
