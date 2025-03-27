@@ -20,8 +20,15 @@ import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
-import com.hospitalfrontend.ui.patients.ListPatients
+import com.hospitalfrontend.ui.profile.CareDataScreen
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
+import com.hospitalfrontend.ui.patients.ListPatients
+ 58-create-care-data-page
+import com.hospitalfrontend.ui.profile.CareDataScreen
+
+
+ main
+
 
 @Composable
 fun AppNavigation() {
@@ -34,9 +41,12 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
-    NavHost(navController = navController, startDestination = "list_rooms") {
-        //composable("personal_data") { PersonalDataScreen(navController = navController) }
-        composable("medical_data") { MedicalDataScreen(navController = navController) }
+ 58-create-care-data-page
+    NavHost(navController = navController, startDestination = "care_data") {
+        composable("care_data") { CareDataScreen(navController = navController) }
+        composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
+
+ main
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
