@@ -81,7 +81,7 @@ fun ListRoomScreen(navController: NavController, listRoomsViewModel: ListRoomsVi
                             ) {
                                 items(rooms) { room ->
                                     RoomItem(room = room, onClick = {
-                                        // Navegación o lógica al seleccionar la habitación
+                                        navController.navigate("list_patients/${room.roomNumber}")
                                     })
                                     Spacer(modifier = Modifier.height(8.dp))
                                 }
