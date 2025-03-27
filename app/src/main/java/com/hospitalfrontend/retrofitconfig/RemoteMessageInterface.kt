@@ -2,6 +2,7 @@ package com.hospitalfrontend.retrofitconfig
 
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
+import com.hospitalfrontend.model.PatientResponse
 import com.hospitalfrontend.model.RemoteMessage
 import com.hospitalfrontend.model.RoomResponse
 import retrofit2.Response
@@ -47,4 +48,7 @@ interface RemoteMessageInterface {
 
     @GET("/room/all")
     suspend fun getAllRooms(): Response<RoomResponse>
+
+    @GET("/patient/byroomnumber/{roomNumber}")
+    suspend fun getAllPatientsByRoomNumber(@Path("roomNumber") roomNumber: Int): Response<PatientResponse>
 }

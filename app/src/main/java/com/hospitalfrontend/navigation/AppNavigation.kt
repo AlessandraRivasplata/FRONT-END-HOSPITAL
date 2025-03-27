@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
-import com.hospitalfrontend.ui.nurseinfo.all.AllNursesScreen
 import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
@@ -21,8 +20,8 @@ import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
+import com.hospitalfrontend.ui.patients.ListPatients
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
-import com.hospitalfrontend.ui.profile.PersonalDataScreen
 
 @Composable
 fun AppNavigation() {
@@ -83,6 +82,10 @@ fun AppNavigation() {
         }
         composable("medical_data") {
             MedicalDataScreen(navController)
+        }
+        composable("list_patients/{roomNumber}") { backStackEntry ->
+            val roomNumber = backStackEntry.arguments?.getString("roomNumber")
+            ListPatients(navController, roomNumber)
         }
     }
 }
