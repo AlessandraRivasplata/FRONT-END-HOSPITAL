@@ -22,7 +22,12 @@ import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
 import com.hospitalfrontend.ui.patients.ListPatients
 import com.hospitalfrontend.ui.profile.PersonalDataScreen
+import com.hospitalfrontend.ui.profile.CareDataScreen
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
+import com.hospitalfrontend.ui.patients.ListPatients
+import com.hospitalfrontend.ui.profile.CareDataScreen
+
+
 
 @Composable
 fun AppNavigation() {
@@ -41,6 +46,9 @@ fun AppNavigation() {
             PersonalDataScreen(navController = navController, patientId = patientId)
         }
         composable("medical_data") { MedicalDataScreen(navController = navController) }
+        composable("care_data") { CareDataScreen(navController = navController) }
+        composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
+
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
