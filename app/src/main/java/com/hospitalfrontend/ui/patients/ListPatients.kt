@@ -1,14 +1,10 @@
 package com.hospitalfrontend.ui.patients
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -20,14 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.hospitalfrontend.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,8 +43,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
                             text = "HABITACIÓN $roomNumber",
                             fontSize = 20.sp,
                             color = Color.Black,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center
+                            style = MaterialTheme.typography.titleLarge
                         )
                     }
                 },
@@ -73,8 +64,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (patientsUiState) {
@@ -83,7 +73,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
                 }
                 is PatientsUiState.Success -> {
                     patients.forEach { patient ->
-                        PatientCard(patient.name, "Room $roomNumber")
+                        PatientCard(navController, patient.idPatient.toString(), patient.name, "Room $roomNumber")
                     }
                 }
                 is PatientsUiState.Error -> {
@@ -96,11 +86,14 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
 }
 
 @Composable
-fun PatientCard(patientName: String, room: String) {
+fun PatientCard(navController: NavController, patientId: String, patientName: String, room: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable {
+                Log.d("PatientDebug", "Patient ID: ${patientId}")
+                navController.navigate("personal_data/$patientId") },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -131,4 +124,3 @@ fun PatientCard(patientName: String, room: String) {
         }
     }
 }
-

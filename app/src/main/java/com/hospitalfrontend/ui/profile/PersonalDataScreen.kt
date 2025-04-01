@@ -15,17 +15,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
+import com.hospitalfrontend.model.Patient
+import com.hospitalfrontend.ui.profile.PatientDataViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PersonalDataScreen(navController: NavController) {
+fun PersonalDataScreen(
+    navController: NavController,
+    patientId: String?,
+    viewModel: PatientDataViewModel = viewModel()
+) {
     var isEditing by remember { mutableStateOf(false) }
-    var drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
 
+    // Obtenemos el paciente desde el ViewModel
+    val patient by viewModel.patient.collectAsState()
+
+    // Llamamos a la API cuando la pantalla se carga
+    LaunchedEffect(patientId) {
+        patientId?.toIntOrNull()?.let { id ->
+            viewModel.getPatientById(id)
+        }
+    }
+
+    // Variables para los campos
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
     var apellido by remember { mutableStateOf(TextFieldValue("")) }
     var fechaNacimiento by remember { mutableStateOf(TextFieldValue("")) }
@@ -33,8 +51,21 @@ fun PersonalDataScreen(navController: NavController) {
     var lengua by remember { mutableStateOf(TextFieldValue("")) }
     var antecedentes by remember { mutableStateOf(TextFieldValue("")) }
     var alergias by remember { mutableStateOf(TextFieldValue("")) }
-    var cuidadorNombre by remember { mutableStateOf(TextFieldValue("")) }
-    var cuidadorTelefono by remember { mutableStateOf(TextFieldValue("")) }
+    var familiarInfo by remember { mutableStateOf(TextFieldValue("")) }
+
+    // Cuando el paciente cambia, actualizamos los campos
+    LaunchedEffect(patient) {
+        patient?.let {
+            nombre = TextFieldValue(it.name)
+            apellido = TextFieldValue(it.surname)
+            fechaNacimiento = TextFieldValue(it.birthDate)
+            direccion = TextFieldValue(it.address)
+            lengua = TextFieldValue(it.language)
+            antecedentes = TextFieldValue(it.medicalHistory)
+            alergias = TextFieldValue(it.allergies)
+            familiarInfo = TextFieldValue(it.familiarInfo)
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -42,7 +73,9 @@ fun PersonalDataScreen(navController: NavController) {
             ModalDrawerSheet {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.medico_menu),
@@ -53,7 +86,7 @@ fun PersonalDataScreen(navController: NavController) {
                     Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
                     DrawerItem("Datos Médicos") { navController.navigate("medical_data") }
-                    DrawerItem("Datos Personales") { navController.navigate("personal_data") }
+                    DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
                     DrawerItem("Datos de Cuidado") { navController.navigate("care_data") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
@@ -144,9 +177,8 @@ fun PersonalDataScreen(navController: NavController) {
                 InputField(value = antecedentes, onValueChange = { antecedentes = it }, label = "Antecedentes médicos", enabled = isEditing)
                 InputField(value = alergias, onValueChange = { alergias = it }, label = "Alergias", enabled = isEditing)
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(text = "Datos del Cuidador", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                InputField(value = cuidadorNombre, onValueChange = { cuidadorNombre = it }, label = "Nombre del cuidador", enabled = isEditing)
-                InputField(value = cuidadorTelefono, onValueChange = { cuidadorTelefono = it }, label = "Teléfono del cuidador", enabled = isEditing)
+                Text(text = "Información Familiar", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                InputField(value = familiarInfo, onValueChange = { familiarInfo = it }, label = "Información del familiar", enabled = isEditing)
                 Spacer(modifier = Modifier.height(20.dp))
                 if (isEditing) {
                     Button(

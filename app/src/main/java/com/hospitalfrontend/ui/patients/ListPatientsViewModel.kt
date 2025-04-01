@@ -32,7 +32,7 @@ class ListPatientsViewModel : ViewModel() {
             _patientsUiState.value = PatientsUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.118.0.51:8080/") // Verifica que sea la URL correcta
+                    .baseUrl("http://10.118.0.51:8080/") // Verifica que sea la URL correcta 10.118.0.51 192.168.1.35
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
@@ -43,6 +43,7 @@ class ListPatientsViewModel : ViewModel() {
                     response.body()?.let { body ->
                         _patients.value = body.data
                         _patientsUiState.value = PatientsUiState.Success
+                        Log.d("URL", "Request: ${endpoint.getAllPatientsByRoomNumber(roomNumber)}")
                         Log.d("Patients", "Patients loaded: ${body.data}")
                     } ?: run {
                         Log.d("Patients", "No data in response body")
@@ -59,3 +60,4 @@ class ListPatientsViewModel : ViewModel() {
         }
     }
 }
+
