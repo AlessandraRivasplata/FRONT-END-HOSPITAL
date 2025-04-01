@@ -47,7 +47,6 @@ fun AppNavigation() {
         }
         composable("medical_data") { MedicalDataScreen(navController = navController) }
         composable("care_data") { CareDataScreen(navController = navController) }
-        composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
 
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
