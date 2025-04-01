@@ -21,6 +21,7 @@ import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
 import com.hospitalfrontend.ui.patients.ListPatients
+import com.hospitalfrontend.ui.profile.PersonalDataScreen
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
 
 @Composable
@@ -35,7 +36,10 @@ fun AppNavigation() {
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
     NavHost(navController = navController, startDestination = "list_rooms") {
-        //composable("personal_data") { PersonalDataScreen(navController = navController) }
+        composable("personal_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            PersonalDataScreen(navController = navController, patientId = patientId)
+        }
         composable("medical_data") { MedicalDataScreen(navController = navController) }
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
