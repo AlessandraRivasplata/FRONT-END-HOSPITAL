@@ -85,7 +85,7 @@ fun PersonalDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-                    DrawerItem("Datos Médicos") { navController.navigate("medical_data") }
+                    DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
                     DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
                     DrawerItem("Datos de Cuidado") { navController.navigate("care_data") }
                     Spacer(modifier = Modifier.weight(1f))
