@@ -1,5 +1,6 @@
 package com.hospitalfrontend.retrofitconfig
 
+import com.hospitalfrontend.model.DiagnosisResponse
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
 import com.hospitalfrontend.model.PatientResponse
@@ -55,4 +56,7 @@ interface RemoteMessageInterface {
 
     @GET("/patient/{id}")
     suspend fun getPatientById(@Path("id") id: Int): Response<PatientResponseById>
+
+    @GET("/diagnosis/{id}")
+    suspend fun getDiagnosisByPatientId(@Path("id") id: Int): Response<DiagnosisResponse>
 }

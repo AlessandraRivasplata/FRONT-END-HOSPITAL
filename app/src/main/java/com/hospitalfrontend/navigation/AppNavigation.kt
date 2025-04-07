@@ -45,7 +45,10 @@ fun AppNavigation() {
             val patientId = backStackEntry.arguments?.getString("patientId")
             PersonalDataScreen(navController = navController, patientId = patientId)
         }
-        composable("medical_data") { MedicalDataScreen(navController = navController) }
+        composable("medical_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            MedicalDataScreen(navController = navController, patientId = patientId)
+        }
         composable("care_data") { CareDataScreen(navController = navController) }
 
         composable("home") { HomeScreen(navController) }
@@ -91,9 +94,7 @@ fun AppNavigation() {
         composable("list_rooms") {
             ListRoomScreen(navController)
         }
-        composable("medical_data") {
-            MedicalDataScreen(navController)
-        }
+
         composable("list_patients/{roomNumber}") { backStackEntry ->
             val roomNumber = backStackEntry.arguments?.getString("roomNumber")
             ListPatients(navController, roomNumber)
