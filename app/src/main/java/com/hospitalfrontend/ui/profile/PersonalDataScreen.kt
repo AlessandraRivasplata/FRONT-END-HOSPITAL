@@ -87,7 +87,7 @@ fun PersonalDataScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
                     DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
-                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data") }
+                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
