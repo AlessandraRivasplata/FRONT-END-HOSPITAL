@@ -49,7 +49,10 @@ fun AppNavigation() {
             val patientId = backStackEntry.arguments?.getString("patientId")
             MedicalDataScreen(navController = navController, patientId = patientId)
         }
-        composable("care_data") { CareDataScreen(navController = navController) }
+        composable("care_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            CareDataScreen(navController = navController, patientId = patientId)
+        }
 
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
