@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
-import com.hospitalfrontend.ui.nurseinfo.all.AllNursesScreen
+import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
 import com.hospitalfrontend.ui.authentication.NurseLoginScreen
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
@@ -21,8 +21,14 @@ import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
-import com.hospitalfrontend.ui.rooms.ListRoomScreen
+import com.hospitalfrontend.ui.patients.ListPatients
 import com.hospitalfrontend.ui.profile.PersonalDataScreen
+import com.hospitalfrontend.ui.profile.CareDataScreen
+import com.hospitalfrontend.ui.rooms.ListRoomScreen
+import com.hospitalfrontend.ui.patients.ListPatients
+import com.hospitalfrontend.ui.profile.CareDataScreen
+
+
 
 @Composable
 fun AppNavigation() {
@@ -36,7 +42,20 @@ fun AppNavigation() {
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
     NavHost(navController = navController, startDestination = "list_rooms") {
-        composable("personal_data") { PersonalDataScreen(navController = navController) } // Agregar el navController aquí
+        
+        composable("personal_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            PersonalDataScreen(navController = navController, patientId = patientId)
+        }
+        composable("medical_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            MedicalDataScreen(navController = navController, patientId = patientId)
+        }
+        composable("care_data/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            CareDataScreen(navController = navController, patientId = patientId)
+        }
+
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
@@ -69,8 +88,8 @@ fun AppNavigation() {
                 nurseLoginViewModel
             )
         }
-        composable("findbyid_nurse/{id}") {
-                backStackEntry -> val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+        composable("findbyid_nurse/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
             FindNurseByIdScreen(
                 navController,
                 findNurseByIdViewModel,
@@ -80,8 +99,15 @@ fun AppNavigation() {
         composable("list_rooms") {
             ListRoomScreen(navController)
         }
+
+        // Se mantienen ambos cambios (care_details y list_patients)
         composable("care_details") {
             CareDetailScreen(navController)
         }
+        composable("list_patients/{roomNumber}") { backStackEntry ->
+            val roomNumber = backStackEntry.arguments?.getString("roomNumber")
+            ListPatients(navController, roomNumber)
+        }
     }
 }
+

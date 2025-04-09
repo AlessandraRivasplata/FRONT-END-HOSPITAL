@@ -1,8 +1,14 @@
 package com.hospitalfrontend.retrofitconfig
 
+import com.hospitalfrontend.model.Care
+import com.hospitalfrontend.model.CareResponse
+import com.hospitalfrontend.model.DiagnosisResponse
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
+import com.hospitalfrontend.model.PatientResponse
+import com.hospitalfrontend.model.PatientResponseById
 import com.hospitalfrontend.model.RemoteMessage
+import com.hospitalfrontend.model.RoomResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -12,6 +18,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.sql.Wrapper
 
 
 interface RemoteMessageInterface {
@@ -30,8 +37,7 @@ interface RemoteMessageInterface {
 
     @POST("/nurse/login")
     suspend fun login(
-        @Query("username") username: String,
-        @Query("password") password: String
+        @Query("nurseNumber") nurseNumber: Int
     ): Response<Nurse>
 
     @DELETE("nurse/{id}")
@@ -45,5 +51,18 @@ interface RemoteMessageInterface {
         @Query("password") password: String
     ): Response<Unit>
 
+    @GET("/room/all")
+    suspend fun getAllRooms(): Response<RoomResponse>
 
+    @GET("/patient/byroomnumber/{roomNumber}")
+    suspend fun getAllPatientsByRoomNumber(@Path("roomNumber") roomNumber: Int): Response<PatientResponse>
+
+    @GET("/patient/{id}")
+    suspend fun getPatientById(@Path("id") id: Int): Response<PatientResponseById>
+
+    @GET("/diagnosis/{id}")
+    suspend fun getDiagnosisByPatientId(@Path("id") id: Int): Response<DiagnosisResponse>
+
+    @GET("care/bypatientid/{id}")
+    suspend fun getCaresByPatientId(@Path("id") id: Int): Response<CareResponse>
 }
