@@ -14,6 +14,7 @@ import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.authentication.NurseLoginViewModel
 import com.hospitalfrontend.ui.authentication.NurseRegisterViewModel
+import com.hospitalfrontend.ui.care.CareDetailScreen
 import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdScreen
 import com.hospitalfrontend.ui.nurseinfo.byId.FindNurseByIdViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
@@ -41,6 +42,7 @@ fun AppNavigation() {
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
     NavHost(navController = navController, startDestination = "list_rooms") {
+        
         composable("personal_data/{patientId}") { backStackEntry ->
             val patientId = backStackEntry.arguments?.getString("patientId")
             PersonalDataScreen(navController = navController, patientId = patientId)
@@ -86,8 +88,8 @@ fun AppNavigation() {
                 nurseLoginViewModel
             )
         }
-        composable("findbyid_nurse/{id}") {
-                backStackEntry -> val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+        composable("findbyid_nurse/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
             FindNurseByIdScreen(
                 navController,
                 findNurseByIdViewModel,
@@ -98,9 +100,14 @@ fun AppNavigation() {
             ListRoomScreen(navController)
         }
 
+        // Se mantienen ambos cambios (care_details y list_patients)
+        composable("care_details") {
+            CareDetailScreen(navController)
+        }
         composable("list_patients/{roomNumber}") { backStackEntry ->
             val roomNumber = backStackEntry.arguments?.getString("roomNumber")
             ListPatients(navController, roomNumber)
         }
     }
 }
+
