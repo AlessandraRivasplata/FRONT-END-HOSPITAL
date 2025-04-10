@@ -1,5 +1,8 @@
 package com.hospitalfrontend.retrofitconfig
 
+import com.hospitalfrontend.model.Care
+import com.hospitalfrontend.model.CareResponse
+import com.hospitalfrontend.model.DiagnosisResponse
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
 import com.hospitalfrontend.model.PatientResponse
@@ -15,6 +18,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.sql.Wrapper
 
 
 interface RemoteMessageInterface {
@@ -55,4 +59,10 @@ interface RemoteMessageInterface {
 
     @GET("/patient/{id}")
     suspend fun getPatientById(@Path("id") id: Int): Response<PatientResponseById>
+
+    @GET("/diagnosis/{id}")
+    suspend fun getDiagnosisByPatientId(@Path("id") id: Int): Response<DiagnosisResponse>
+
+    @GET("care/bypatientid/{id}")
+    suspend fun getCaresByPatientId(@Path("id") id: Int): Response<CareResponse>
 }
