@@ -173,15 +173,6 @@ fun CareDetailScreen(navController: NavController) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-            if (isEditing) {
-                Button(
-                    onClick = { isEditing = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Guardar")
-                }
-            }
             // Sección Dieta
             Text("Dieta", fontSize = 18.sp, modifier = Modifier.clickable { showDietaFields = !showDietaFields })
             if (showDietaFields) {
