@@ -100,7 +100,7 @@ fun AppNavigation() {
             ListRoomScreen(navController)
         }
 
-        // Se mantienen ambos cambios (care_details y list_patients)
+
         composable("care_details") {
             CareDetailScreen(navController)
         }
