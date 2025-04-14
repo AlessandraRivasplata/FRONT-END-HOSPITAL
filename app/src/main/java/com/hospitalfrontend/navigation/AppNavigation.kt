@@ -101,9 +101,13 @@ fun AppNavigation() {
         }
 
 
-        composable("care_details") {
-            CareDetailScreen(navController)
+        composable("care_details/{careId}") { backStackEntry ->
+            val careId = backStackEntry.arguments?.getString("careId")?.toIntOrNull()
+            if (careId != null) {
+                CareDetailScreen(careId = careId, navController = navController)
+            }
         }
+
         composable("list_patients/{roomNumber}") { backStackEntry ->
             val roomNumber = backStackEntry.arguments?.getString("roomNumber")
             ListPatients(navController, roomNumber)

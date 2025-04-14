@@ -153,30 +153,34 @@ fun CareDataScreen(
                 )
 
                 // Mostramos todas las tarjetas con los datos reales
-                cares.forEach { care ->
-                    CareDataCard(
-                        name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
-                        specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
-                        status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
-                        location = "Enfermera: ${care.nurse.name}",
-                        dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
-                        type = "Nota: ${care.note}"
-                    )
-                }
-            }
-        }
+    cares.forEach { care ->
+        CareDataCard(
+            careId = care.idCare,
+            name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
+            specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
+            status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
+            location = "Enfermera: ${care.nurse.name}",
+            dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
+            type = "Nota: ${care.note}",
+            navController = navController
+        )
     }
+}
+}
+}
 }
 
 
 @Composable
 fun CareDataCard(
+    careId: Int,
     name: String,
     specialty: String,
     status: String,
     location: String,
     dateTime: String,
-    type: String
+    type: String,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
@@ -250,7 +254,7 @@ fun CareDataCard(
                 )
             }
             Button(
-                onClick = { /* Acción para ver detalles */ },
+                onClick = { navController.navigate("care_details/${careId}") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
                 modifier = Modifier
                     .height(40.dp)

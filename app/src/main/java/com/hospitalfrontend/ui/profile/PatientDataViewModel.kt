@@ -31,7 +31,7 @@ class PatientDataViewModel : ViewModel() {
             _patientUiState.value = PatientUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.118.0.51:8080/") // Verifica la IP correcta
+                    .baseUrl("http://192.168.1.65:8080/") // Verifica la IP correcta 10.118.0.51 192.168.1.65
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
