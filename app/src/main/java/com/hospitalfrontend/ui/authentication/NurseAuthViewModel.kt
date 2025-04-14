@@ -12,9 +12,7 @@ class NurseAuthViewModel : ViewModel() {
     private val _nursePassword = MutableStateFlow("")
 
     private val _nurses = MutableStateFlow<List<Nurse>>(listOf(
-        Nurse(1, "Paco Perez", "paco123", "pperez", null),
-        Nurse(2, "Fran Rodriguez", "fran123", "frodriguez", null),
-        Nurse(3, "Pepe Gomez", "pepe123", "pgomez", null)
+
     ))
 
     // Public StateFlow to observe the list of nurses
@@ -34,7 +32,8 @@ class NurseAuthViewModel : ViewModel() {
             name = name,
             password = password,
             username = username,
-            profileImage = null
+            profileImage = null,
+            nurseNumber = TODO()
         )
 
         _nurses.value = _nurses.value + newNurse // Add the new nurse to the list

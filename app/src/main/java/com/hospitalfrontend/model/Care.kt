@@ -44,7 +44,8 @@ data class Care(
     val note: String,
 
     val nurse: Nurse,
-    val patient: Patient
+    val patient: Patient,
+    val room: Room
 )
 
 data class CareResponse(

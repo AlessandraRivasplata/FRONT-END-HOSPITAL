@@ -65,4 +65,8 @@ interface RemoteMessageInterface {
 
     @GET("care/bypatientid/{id}")
     suspend fun getCaresByPatientId(@Path("id") id: Int): Response<CareResponse>
+
+    @GET("/care/{id}")
+    suspend fun getCareById(@Path("id") id: Int): Response<Care>
+
 }
