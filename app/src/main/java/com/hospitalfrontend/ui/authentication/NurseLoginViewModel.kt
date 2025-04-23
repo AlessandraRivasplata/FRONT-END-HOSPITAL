@@ -31,7 +31,7 @@ class NurseLoginViewModel : ViewModel() {
             _nurseLoginUiState.value = NurseLoginUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.118.0.51:8080") //ip del servidor springboot
+                    .baseUrl("http://10.118.3.202:8080") //10.118.3.202 10.118.0.51
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

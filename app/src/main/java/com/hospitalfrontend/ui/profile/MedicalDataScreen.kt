@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.profile
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -17,13 +19,15 @@ import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicalDataScreen(
     navController: NavController,
     patientId: String?,
-    medicalDataViewModel: MedicalDataViewModel = viewModel() // Obtener la instancia del ViewModel
+    medicalDataViewModel: MedicalDataViewModel = viewModel(), // Obtener la instancia del ViewModel
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     // Estado para el drawer
     var drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -32,6 +36,8 @@ fun MedicalDataScreen(
     // Obtenemos el estado y los datos del ViewModel
     val diagnosisState by medicalDataViewModel.medicalDataUiState.collectAsState()
     val diagnosisData by medicalDataViewModel.diagnosis.collectAsState()
+
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
 
     // Hacer la consulta cuando se llega a la pantalla
     LaunchedEffect(patientId) {
@@ -56,7 +62,7 @@ fun MedicalDataScreen(
                         modifier = Modifier.size(150.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
                     DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
                     DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }

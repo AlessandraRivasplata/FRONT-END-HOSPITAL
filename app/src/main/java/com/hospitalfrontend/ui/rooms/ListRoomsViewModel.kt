@@ -32,7 +32,7 @@ class ListRoomsViewModel : ViewModel() {
             _roomsUiState.value = RoomsUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://192.168.1.65:8080/") // Asegúrate de que la URL de base sea correcta 10.118.0.51 192.168.1.35 192.168.1.65
+                    .baseUrl("http://10.118.3.202:8080/") // 10.118.0.51 192.168.1.35 192.168.1.65 10.118.3.202
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
