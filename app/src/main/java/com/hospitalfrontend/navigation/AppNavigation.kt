@@ -41,7 +41,7 @@ fun AppNavigation() {
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
 
     // para que se vea el login como primera pantalla cambiar el startDestination por login_nurse
-    NavHost(navController = navController, startDestination = "list_rooms") {
+    NavHost(navController = navController, startDestination = "login_nurse") {
         
         composable("personal_data/{patientId}") { backStackEntry ->
             val patientId = backStackEntry.arguments?.getString("patientId")
@@ -100,10 +100,14 @@ fun AppNavigation() {
             ListRoomScreen(navController)
         }
 
-        // Se mantienen ambos cambios (care_details y list_patients)
-        composable("care_details") {
-            CareDetailScreen(navController)
+
+        composable("care_details/{careId}") { backStackEntry ->
+            val careId = backStackEntry.arguments?.getString("careId")?.toIntOrNull()
+            if (careId != null) {
+                CareDetailScreen(careId = careId, navController = navController)
+            }
         }
+
         composable("list_patients/{roomNumber}") { backStackEntry ->
             val roomNumber = backStackEntry.arguments?.getString("roomNumber")
             ListPatients(navController, roomNumber)

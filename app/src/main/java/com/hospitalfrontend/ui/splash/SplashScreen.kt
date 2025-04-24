@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,10 +22,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.hospitalfrontend.MainActivity
 import com.hospitalfrontend.R
+import com.hospitalfrontend.ui.rooms.ListRoomsViewModel
+import com.hospitalfrontend.ui.rooms.RoomsUiState
 import kotlinx.coroutines.delay
 
 @SuppressLint("CustomSplashScreen")
 class SplashScreen : ComponentActivity() {
+
+    private val viewModel: ListRoomsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -35,28 +41,39 @@ class SplashScreen : ComponentActivity() {
                 )
 
         setContent {
-            SplashScreenContent()
+            val uiState by viewModel.roomsUiState.collectAsState()
 
-            LaunchedEffect(Unit) {
-                delay(5000)
-                startActivity(Intent(this@SplashScreen, MainActivity::class.java))
-                finish()
+            SplashScreenContent(
+                uiState = uiState,
+                onRetry = { viewModel.getAllRooms() }
+            )
+
+            LaunchedEffect(uiState) {
+                if (uiState == RoomsUiState.Initial) {
+                    viewModel.getAllRooms()
+                } else if (uiState == RoomsUiState.Success) {
+                    delay(1000)
+                    startActivity(Intent(this@SplashScreen, MainActivity::class.java))
+                    finish()
+                }
             }
         }
     }
 }
 
 @Composable
-fun SplashScreenContent() {
+fun SplashScreenContent(
+    uiState: RoomsUiState,
+    onRetry: () -> Unit
+) {
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Imagen de fondo que ocupa toda la pantalla
+        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.wife_visiting_her_ill_husband),
-            contentDescription = "Esposa visitando a su esposo enfermo",
+            contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -71,10 +88,35 @@ fun SplashScreenContent() {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_hospitex),
-                contentDescription = "Logo",
+                contentDescription = null,
                 modifier = Modifier.size(135.dp)
             )
         }
+
+        // Círculo de carga
+        if (uiState == RoomsUiState.Loading) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
+
+        // Botón de reintentar
+        if (uiState == RoomsUiState.Error) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(onClick = onRetry) {
+                    Text("Reintentar")
+                }
+            }
+        }
     }
 }
-

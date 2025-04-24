@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.profile
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -20,6 +22,7 @@ import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.model.Patient
 import com.hospitalfrontend.ui.profile.PatientDataViewModel
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +30,8 @@ import kotlinx.coroutines.launch
 fun PersonalDataScreen(
     navController: NavController,
     patientId: String?,
-    viewModel: PatientDataViewModel = viewModel()
+    viewModel: PatientDataViewModel = viewModel(),
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     var isEditing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -35,6 +39,8 @@ fun PersonalDataScreen(
 
     // Obtenemos el paciente desde el ViewModel
     val patient by viewModel.patient.collectAsState()
+
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
 
     // Llamamos a la API cuando la pantalla se carga
     LaunchedEffect(patientId) {
@@ -83,7 +89,7 @@ fun PersonalDataScreen(
                         modifier = Modifier.size(150.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
                     DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
                     DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }

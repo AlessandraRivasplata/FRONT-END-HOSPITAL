@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.profile
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,19 +21,29 @@ import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.model.DiagnosisResponse
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicalDataScreen(
     navController: NavController,
     patientId: String?,
-    medicalDataViewModel: MedicalDataViewModel = viewModel()
+    medicalDataViewModel: MedicalDataViewModel = viewModel(), // Obtener la instancia del ViewModel
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val diagnosisState: MedicalDataUiState by medicalDataViewModel.medicalDataUiState.collectAsState()
     val diagnosisData: DiagnosisResponse? by medicalDataViewModel.diagnosis.collectAsState()
 
+    // Obtenemos el estado y los datos del ViewModel
+    val diagnosisState by medicalDataViewModel.medicalDataUiState.collectAsState()
+    val diagnosisData by medicalDataViewModel.diagnosis.collectAsState()
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
+
+    // Hacer la consulta cuando se llega a la pantalla
     LaunchedEffect(patientId) {
         patientId?.toIntOrNull()?.let { id ->
             medicalDataViewModel.getDiagnosisByPatientId(id)

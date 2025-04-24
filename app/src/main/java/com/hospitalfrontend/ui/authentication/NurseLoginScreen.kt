@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.authentication
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -18,19 +20,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NurseLoginScreen(navController: NavController, nurseLoginViewModel: NurseLoginViewModel = viewModel()) {
+fun NurseLoginScreen(
+    navController: NavController,
+    nurseLoginViewModel: NurseLoginViewModel = viewModel(),
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
+) {
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
 
-    // Observar el estado de nurseLoginUiState
     val nurseLoginUiState by nurseLoginViewModel.nurseLoginUiState.collectAsState()
+    val nurse by nurseLoginViewModel.nurse.collectAsState() // Observamos el nurse actual
 
-    // Manejo de navegación basado en el estado del login
     LaunchedEffect(nurseLoginUiState) {
-        if (nurseLoginUiState is NurseLoginUiState.Success) {
+        if (nurseLoginUiState is NurseLoginUiState.Success && nurse != null) {
+            nurseSharedViewModel.nurse = nurse // Guardamos en el shared
             navController.navigate("list_rooms")
         }
     }

@@ -1,6 +1,7 @@
 package com.hospitalfrontend.ui.profile
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.ui.care.CaresDataViewModel
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,13 +30,16 @@ import kotlinx.coroutines.launch
 fun CareDataScreen(
     navController: NavController,
     patientId: String?,
-    viewModel: CaresDataViewModel = viewModel()
+    viewModel: CaresDataViewModel = viewModel(),
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     val caresViewModel: CaresDataViewModel = viewModel()
     val cares = caresViewModel.cares.collectAsState().value
+
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
 
     // Llamada a la API al entrar en la pantalla
     LaunchedEffect(patientId) {
@@ -54,7 +60,9 @@ fun CareDataScreen(
             ModalDrawerSheet {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.medico_menu),
@@ -62,11 +70,11 @@ fun CareDataScreen(
                         modifier = Modifier.size(150.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Nombre de Usuario", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-                    DrawerItem("Datos Médicos") { navController.navigate("medical_data") }
-                    DrawerItem("Datos Personales") { navController.navigate("personal_data") }
-                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data") }
+                    DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
+                    DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
+                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
@@ -151,30 +159,34 @@ fun CareDataScreen(
                 )
 
                 // Mostramos todas las tarjetas con los datos reales
-                cares.forEach { care ->
-                    CareDataCard(
-                        name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
-                        specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
-                        status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
-                        location = "Enfermera: ${care.nurse.name}",
-                        dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
-                        type = "Nota: ${care.note}"
-                    )
-                }
-            }
-        }
+    cares.forEach { care ->
+        CareDataCard(
+            careId = care.idCare,
+            name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
+            specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
+            status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
+            location = "Enfermera: ${care.nurse.name}",
+            dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
+            type = "Nota: ${care.note}",
+            navController = navController
+        )
     }
+}
+}
+}
 }
 
 
 @Composable
 fun CareDataCard(
+    careId: Int,
     name: String,
     specialty: String,
     status: String,
     location: String,
     dateTime: String,
-    type: String
+    type: String,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
@@ -248,7 +260,7 @@ fun CareDataCard(
                 )
             }
             Button(
-                onClick = { /* Acción para ver detalles */ },
+                onClick = { navController.navigate("care_details/${careId}") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
                 modifier = Modifier
                     .height(40.dp)

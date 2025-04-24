@@ -121,7 +121,11 @@ fun NurseRegisterScreen(
                 Button(
                     onClick = {
                         if (name.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty()) {
-                            val nurse = Nurse(id = 0, name = name, username = username, password = password)
+                            val nurse = Nurse(
+                                id = 0, name = name, username = username, password = password,
+                                nurseNumber = TODO(),
+                                profileImage = TODO()
+                            )
                             createNurseViewModel.createNurse(nurse)
                         } else {
                             errorMessage = "Todos los campos son obligatorios"
