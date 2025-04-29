@@ -32,7 +32,7 @@ class ListPatientsViewModel : ViewModel() {
             _patientsUiState.value = PatientsUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.118.3.202:8080/") // 10.118.0.51 192.168.1.35 192.168.1.65 10.118.3.202
+                    .baseUrl("http://10.0.2.2:8080/") // 10.118.0.51 192.168.1.35 192.168.1.65 10.118.3.202
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

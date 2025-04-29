@@ -11,13 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
-import com.hospitalfrontend.ui.profile.DrawerItem
 import com.hospitalfrontend.ui.profile.InputField
 import com.hospitalfrontend.viewmodel.CareDetailViewModel
 import kotlinx.coroutines.launch
@@ -28,7 +29,6 @@ fun CareDetailScreen(
     careId: Int,
     navController: NavController,
 ) {
-    // Instanciamos el ViewModel y lanzamos la consulta al entrar en la pantalla
     val viewModel: CareDetailViewModel = viewModel()
     LaunchedEffect(careId) {
         viewModel.getCareById(careId)
@@ -38,14 +38,12 @@ fun CareDetailScreen(
     var drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Mostrar/Ocultar secciones
     var showTensionFields by remember { mutableStateOf(false) }
     var showDrenajesFields by remember { mutableStateOf(false) }
     var showHigieneFields by remember { mutableStateOf(false) }
     var showDietaFields by remember { mutableStateOf(false) }
     var showMobilizacionesFields by remember { mutableStateOf(false) }
 
-    // Variables de campos
     var tensionSistolica by remember { mutableStateOf(TextFieldValue("")) }
     var tensionDiastolica by remember { mutableStateOf(TextFieldValue("")) }
     var frecuenciaRespiratoria by remember { mutableStateOf(TextFieldValue("")) }
@@ -66,11 +64,28 @@ fun CareDetailScreen(
     var portadorProtesi by remember { mutableStateOf(false) }
 
     var observaciones by remember { mutableStateOf(TextFieldValue("")) }
-
-    // Mobilitzacions
     var sedestacion by remember { mutableStateOf(TextFieldValue("")) }
-    var selectedDeambulacion by remember { mutableStateOf("Seleccionar") }
+    var selectedDeambulacion by remember { mutableStateOf(TextFieldValue("")) }
     var cambiosPosturales by remember { mutableStateOf(TextFieldValue("")) }
+
+    val care by viewModel.care.collectAsState()
+
+    LaunchedEffect(care) {
+        care?.let {
+            tensionSistolica = TextFieldValue(it.systolicBp?.toString() ?: "")
+            tensionDiastolica = TextFieldValue(it.diastolicBp?.toString() ?: "")
+            frecuenciaRespiratoria = TextFieldValue(it.respiratoryRate?.toString() ?: "")
+            pulso = TextFieldValue(it.pulse?.toString() ?: "")
+            temperatura = TextFieldValue(it.bodyTemperature?.toString() ?: "")
+            saturacionOxigeno = TextFieldValue(it.oxygenSaturation?.toString() ?: "")
+            drenajeTipo = TextFieldValue(it.drainageType.orEmpty())
+            drenajeDebito = TextFieldValue(it.drainageDebit?.toString() ?: "")
+            observaciones = TextFieldValue(it.note.orEmpty())
+            sedestacion = TextFieldValue(it.sedation.orEmpty())
+            cambiosPosturales = TextFieldValue(it.posturalChanges.orEmpty())
+            selectedDeambulacion = TextFieldValue(it.ambulation.orEmpty())
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -81,7 +96,7 @@ fun CareDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "DETALLE DE CURAS",
+                            text = "DETALL DE CURES",
                             fontSize = 20.sp,
                             color = Color.Black
                         )
@@ -89,7 +104,6 @@ fun CareDetailScreen(
                 },
                 navigationIcon = {
                     Row(
-                        horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -136,138 +150,49 @@ fun CareDetailScreen(
                 contentDescription = "Foto de perfil",
                 modifier = Modifier
                     .size(150.dp)
-                    .clickable { /* Acción para cambiar la imagen */ }
+                    .clickable { }
             )
+
             Spacer(modifier = Modifier.height(20.dp))
-            // Imprimimos todos los datos recibidos de la consulta
-            val care by viewModel.care.collectAsState()
 
-            if (care != null) {
-                Column {
-                    // Datos del cuidado
-                    care?.let {
-                        Text("ID Cuidado: ${it.idCare}")
-                        Text("Presión Sistólica: ${it.systolicBp}")
-                        Text("Presión Diastólica: ${it.diastolicBp}")
-                        Text("Frecuencia Respiratoria: ${it.respiratoryRate}")
-                        Text("Pulso: ${it.pulse}")
-                        Text("Temperatura Corporal: ${it.bodyTemperature}")
-                        Text("Saturación de Oxígeno: ${it.oxygenSaturation}")
-                        Text("Tipo de Drenaje: ${it.drainageType}")
-                        Text("Débito de Drenaje: ${it.drainageDebit}")
-                        Text("Tipo de Higiene: ${it.hygieneType}")
-                        Text("Sedación: ${it.sedation}")
-                        Text("Deambulación: ${it.ambulation}")
-                        Text("Cambios Posturales: ${it.posturalChanges}")
-                        Text("Fecha de Registro: ${it.recordedAt}")
-                        Text("Nota: ${it.note}")
 
-                        // Datos del enfermero/a
-                        Text("\n--- Datos del/la Enfermero/a ---")
-                        Text("ID: ${it.nurse?.id}")
-                        Text("Número de Enfermero/a: ${it.nurse?.nurseNumber}")
-                        Text("Nombre: ${it.nurse?.name}")
-
-                    }
-                }
-            }
             Spacer(modifier = Modifier.height(20.dp))
-            Text("Constantes Vitales", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
 
-            Text("Presión Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })
+            Text("Constants Vitals", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
+
+            Text("Pressió Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })
             if (showTensionFields) {
-                InputField(value = tensionSistolica, onValueChange = { tensionSistolica = it }, label = "Tensión Sistólica", enabled = isEditing)
-                InputField(value = tensionDiastolica, onValueChange = { tensionDiastolica = it }, label = "Tensión Diastólica", enabled = isEditing)
+                InputField(tensionSistolica, { tensionSistolica = it }, "Tensió Sistòlica", isEditing)
+                InputField(tensionDiastolica, { tensionDiastolica = it }, "Tensió Diastòlica", isEditing)
             }
-            InputField(value = frecuenciaRespiratoria, onValueChange = { frecuenciaRespiratoria = it }, label = "Frecuencia Respiratoria", enabled = isEditing)
-            InputField(value = pulso, onValueChange = { pulso = it }, label = "Pulso", enabled = isEditing)
-            InputField(value = temperatura, onValueChange = { temperatura = it }, label = "Temperatura", enabled = isEditing)
-            InputField(value = saturacionOxigeno, onValueChange = { saturacionOxigeno = it }, label = "Saturación de Oxígeno", enabled = isEditing)
 
-            Text("Drenajes", fontSize = 18.sp, modifier = Modifier.clickable { showDrenajesFields = !showDrenajesFields })
+            InputField(frecuenciaRespiratoria, { frecuenciaRespiratoria = it }, "Freqüència Respiratòria", isEditing)
+            InputField(pulso, { pulso = it }, "Pols", isEditing)
+            InputField(temperatura, { temperatura = it }, "Temperatura", isEditing)
+            InputField(saturacionOxigeno, { saturacionOxigeno = it }, "Saturació d'Oxigen", isEditing)
+
+            Text("Drenatges", fontSize = 18.sp, modifier = Modifier.clickable { showDrenajesFields = !showDrenajesFields })
             if (showDrenajesFields) {
-                InputField(value = drenajeTipo, onValueChange = { drenajeTipo = it }, label = "Tipo de Drenaje", enabled = isEditing)
-                InputField(value = drenajeDebito, onValueChange = { drenajeDebito = it }, label = "Débito", enabled = isEditing)
+                InputField(drenajeTipo, { drenajeTipo = it }, "Tipus de Drenatge", isEditing)
+                InputField(drenajeDebito, { drenajeDebito = it }, "Dèbit", isEditing)
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Sección de Higiene
-            Text("Higiene", fontSize = 18.sp, modifier = Modifier.clickable { showHigieneFields = !showHigieneFields })
-            if (showHigieneFields) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Allitat")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Checkbox(checked = higieneAllitat, onCheckedChange = { higieneAllitat = it })
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Parcial al llit")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Checkbox(checked = higieneParcialLlit, onCheckedChange = { higieneParcialLlit = it })
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Dutxa amb ajuda")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Checkbox(checked = higieneDutxaAjuda, onCheckedChange = { higieneDutxaAjuda = it })
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Autònom")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Checkbox(checked = higieneAutonom, onCheckedChange = { higieneAutonom = it })
-                }
-            }
-
-            // Sección Dieta
-            Text("Dieta", fontSize = 18.sp, modifier = Modifier.clickable { showDietaFields = !showDietaFields })
-            if (showDietaFields) {
-                DropdownMenuBox(
-                    selectedOption = selectedTexture,
-                    options = listOf("Absoluta", "Hídrica", "Líquida", "Túrmix", "Semitova", "Tova", "Fàcil masticació", "Basal"),
-                    label = "Textures",
-                    onOptionSelected = { selectedTexture = it }
-                )
-                DropdownMenuBox(
-                    selectedOption = selectedDieta,
-                    options = listOf("Diabètica", "Hipolipídica", "Hipocalòrica", "Hipercalòrica", "Hipoproteica", "Hiperproteica", "Astringent", "Baixa en residus", "Celíaca", "Rica en fibra", "Sense lactosa", "Sense fruits secs", "Sense ou", "Sense porc"),
-                    label = "Tipus de dieta",
-                    onOptionSelected = { selectedDieta = it }
-                )
-                DropdownMenuBox(
-                    selectedOption = autonomia,
-                    options = listOf("Autònom", "Ajuda"),
-                    label = "Autònom o ajuda",
-                    onOptionSelected = { autonomia = it }
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Portador de prótesi")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Checkbox(checked = portadorProtesi, onCheckedChange = { portadorProtesi = it })
-                }
-            }
-
-            // Sección Mobilizaciones
-            Text("Mobilizaciones", fontSize = 18.sp, modifier = Modifier.clickable { showMobilizacionesFields = !showMobilizacionesFields })
+            Text("Mobilitzacions", fontSize = 18.sp, modifier = Modifier.clickable { showMobilizacionesFields = !showMobilizacionesFields })
             if (showMobilizacionesFields) {
-                InputField(value = sedestacion, onValueChange = { sedestacion = it }, label = "Sedestación", enabled = isEditing)
-                DropdownMenuBox(
-                    selectedOption = selectedDeambulacion,
-                    options = listOf("Sin ayuda", "Bastón", "Caminador", "Ayuda física"),
-                    label = "Tipos de deambulación",
-                    onOptionSelected = { selectedDeambulacion = it }
-                )
-                InputField(value = cambiosPosturales, onValueChange = { cambiosPosturales = it }, label = "Cambiios posturales", enabled = isEditing)
+                InputField(sedestacion, { sedestacion = it }, "Sedestació", isEditing)
+                InputField(selectedDeambulacion, { selectedDeambulacion = it }, "Tipus de deambulació", isEditing)
+                InputField(cambiosPosturales, { cambiosPosturales = it }, "Canvis posturals", isEditing)
             }
 
-            // Sección Observaciones
-            InputField(value = observaciones, onValueChange = { observaciones = it }, label = "Observaciones", enabled = isEditing)
+            InputField(observaciones, { observaciones = it }, "Observacions", isEditing)
 
-            Spacer(modifier = Modifier.height(20.dp))
             if (isEditing) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = { isEditing = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Guardar")
+                    Text("Guardar")
                 }
             }
         }
@@ -276,7 +201,12 @@ fun CareDetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuBox(selectedOption: String, options: List<String>, label: String, onOptionSelected: (String) -> Unit) {
+fun DropdownMenuBox(
+    selectedOption: String,
+    options: List<String>,
+    label: String,
+    onOptionSelected: (String) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(selectedOption) }
 
@@ -291,7 +221,7 @@ fun DropdownMenuBox(selectedOption: String, options: List<String>, label: String
                 readOnly = true,
                 label = { Text(label) },
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
                 },
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )
