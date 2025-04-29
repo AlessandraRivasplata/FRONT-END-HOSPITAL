@@ -32,9 +32,7 @@ class MedicalDataViewModel : ViewModel() {
             _medicalDataUiState.value = MedicalDataUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-
-                    .baseUrl("http://10.0.2.2:8081/")//Alessandra ip:10.0.2.2:8081
-
+                    .baseUrl("http://10.0.2.2:8080/") //10.118.0.51  192.168.1.65 10.118.3.202
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

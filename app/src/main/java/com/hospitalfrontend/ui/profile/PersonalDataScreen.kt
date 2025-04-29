@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -200,12 +201,25 @@ fun PersonalDataScreen(
 }
 
 @Composable
-fun InputField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit, label: String, enabled: Boolean) {
+fun InputField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    label: String,
+    enabled: Boolean
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        label = {
+            Text(
+                text = label,
+                style = TextStyle(fontWeight = FontWeight.Bold),
+                color = Color.Black
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         enabled = enabled
     )
 }
