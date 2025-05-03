@@ -226,7 +226,7 @@ fun CareDataCard(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Icon(
-                        painter = painterResource(id = R.drawable.hospital_icono), // Cambia por el ícono que desees
+                        painter = painterResource(id = R.drawable.hospital_icono),
                         contentDescription = "Ubicación",
                         modifier = Modifier.size(16.dp),
                         tint = Color.Gray
