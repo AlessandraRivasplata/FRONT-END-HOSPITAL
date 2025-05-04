@@ -1,5 +1,6 @@
 package com.hospitalfrontend.navigation
 
+import AddCaresScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -55,6 +56,11 @@ fun AppNavigation() {
             val patientId = backStackEntry.arguments?.getString("patientId")
             CareDataScreen(navController = navController, patientId = patientId)
         }
+        composable("add_care/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")
+            AddCaresScreen(navController = navController, patientId = patientId)
+        }
+
 
         composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
@@ -101,10 +107,16 @@ fun AppNavigation() {
         }
 
 
-        composable("care_details/{careId}") { backStackEntry ->
+        composable("care_details/{careId}/{patientId}") { backStackEntry ->
             val careId = backStackEntry.arguments?.getString("careId")?.toIntOrNull()
-            if (careId != null) {
-                CareDetailScreen(careId = careId, navController = navController)
+            val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull()
+
+            if (careId != null && patientId != null) {
+                CareDetailScreen(
+                    careId = careId,
+                    patientId = patientId.toString(),
+                    navController = navController
+                )
             }
         }
 

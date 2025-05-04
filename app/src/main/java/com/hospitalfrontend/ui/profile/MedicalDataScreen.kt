@@ -35,8 +35,8 @@ fun MedicalDataScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val diagnosisState: MedicalDataUiState by medicalDataViewModel.medicalDataUiState.collectAsState()
-    val diagnosisData: DiagnosisResponse? by medicalDataViewModel.diagnosis.collectAsState()
+    //val diagnosisState: MedicalDataUiState by medicalDataViewModel.medicalDataUiState.collectAsState()
+    //val diagnosisData: DiagnosisResponse? by medicalDataViewModel.diagnosis.collectAsState()
 
     // Obtenemos el estado y los datos del ViewModel
     val diagnosisState by medicalDataViewModel.medicalDataUiState.collectAsState()

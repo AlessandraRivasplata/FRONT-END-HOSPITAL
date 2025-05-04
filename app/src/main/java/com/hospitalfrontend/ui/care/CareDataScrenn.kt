@@ -129,7 +129,7 @@ fun CareDataScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* Acción para crear */ }) {
+                        IconButton(onClick = { navController.navigate("add_care/$patientId") }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.crear2_hospital),
                                 contentDescription = "Crear",
@@ -162,6 +162,7 @@ fun CareDataScreen(
     cares.forEach { care ->
         CareDataCard(
             careId = care.idCare,
+            patientId = patientId ?: "",
             name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
             specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
             status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
@@ -180,6 +181,7 @@ fun CareDataScreen(
 @Composable
 fun CareDataCard(
     careId: Int,
+    patientId: String,
     name: String,
     specialty: String,
     status: String,
@@ -260,7 +262,7 @@ fun CareDataCard(
                 )
             }
             Button(
-                onClick = { navController.navigate("care_details/${careId}") },
+                onClick = { navController.navigate("care_details/${careId}/${patientId}") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
                 modifier = Modifier
                     .height(40.dp)

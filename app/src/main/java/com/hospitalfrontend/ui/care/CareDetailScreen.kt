@@ -1,5 +1,6 @@
 package com.hospitalfrontend.ui.care
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.ui.profile.InputField
+import com.hospitalfrontend.ui.profile.MedicalDrawerItem
+import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import com.hospitalfrontend.viewmodel.CareDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -27,6 +31,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CareDetailScreen(
     careId: Int,
+    patientId: String?,
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
     navController: NavController,
 ) {
     val viewModel: CareDetailViewModel = viewModel()
@@ -34,6 +40,7 @@ fun CareDetailScreen(
         viewModel.getCareById(careId)
     }
 
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'Usuari"
     var isEditing by remember { mutableStateOf(false) }
     var drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -87,112 +94,147 @@ fun CareDetailScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "DETALL DE CURES",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
-                    }
-                },
-                navigationIcon = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.flecha_atras),
-                                contentDescription = "Volver",
-                                modifier = Modifier.size(25.dp),
-                                tint = Color.Unspecified
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_icono),
-                                contentDescription = "Menú",
-                                modifier = Modifier.size(25.dp),
-                                tint = Color.Unspecified
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    TextButton(onClick = { isEditing = !isEditing }) {
-                        Text(
-                            text = if (isEditing) "Cancelar" else "Editar",
-                            color = Color.Black,
-                            fontSize = 18.sp
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.medico_menu),
+                        contentDescription = "Imatge del menú",
+                        modifier = Modifier.size(150.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
+                    MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
+                    MedicalDrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { /* Acción para salir */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.log_out_icono),
+                            contentDescription = "Sortir",
+                            modifier = Modifier.size(40.dp),
+                            tint = Color.Unspecified
                         )
                     }
                 }
-            )
+            }
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.care_icon),
-                contentDescription = "Foto de perfil",
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "DETALL DE CURES",
+                                fontSize = 20.sp,
+                                color = Color.Black
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.flecha_atras),
+                                    contentDescription = "Volver",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Color.Unspecified
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.menu_icono),
+                                    contentDescription = "Menú",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Color.Unspecified
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        TextButton(onClick = { isEditing = !isEditing }) {
+                            Text(
+                                text = if (isEditing) "Cancelar" else "Editar",
+                                color = Color.Black,
+                                fontSize = 18.sp
+                            )
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .size(150.dp)
-                    .clickable { }
-            )
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.care_icon),
+                    contentDescription = "Foto de perfil",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clickable { }
+                )
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            Text("Constants Vitals", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
+                Text("Constants Vitals", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
 
-            Text("Pressió Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })
-            if (showTensionFields) {
-                InputField(tensionSistolica, { tensionSistolica = it }, "Tensió Sistòlica", isEditing)
-                InputField(tensionDiastolica, { tensionDiastolica = it }, "Tensió Diastòlica", isEditing)
-            }
+                Text("Pressió Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })
+                if (showTensionFields) {
+                    InputField(tensionSistolica, { tensionSistolica = it }, "Tensió Sistòlica", isEditing)
+                    InputField(tensionDiastolica, { tensionDiastolica = it }, "Tensió Diastòlica", isEditing)
+                }
 
-            InputField(frecuenciaRespiratoria, { frecuenciaRespiratoria = it }, "Freqüència Respiratòria", isEditing)
-            InputField(pulso, { pulso = it }, "Pols", isEditing)
-            InputField(temperatura, { temperatura = it }, "Temperatura", isEditing)
-            InputField(saturacionOxigeno, { saturacionOxigeno = it }, "Saturació d'Oxigen", isEditing)
+                InputField(frecuenciaRespiratoria, { frecuenciaRespiratoria = it }, "Freqüència Respiratòria", isEditing)
+                InputField(pulso, { pulso = it }, "Pols", isEditing)
+                InputField(temperatura, { temperatura = it }, "Temperatura", isEditing)
+                InputField(saturacionOxigeno, { saturacionOxigeno = it }, "Saturació d'Oxigen", isEditing)
 
-            Text("Drenatges", fontSize = 18.sp, modifier = Modifier.clickable { showDrenajesFields = !showDrenajesFields })
-            if (showDrenajesFields) {
-                InputField(drenajeTipo, { drenajeTipo = it }, "Tipus de Drenatge", isEditing)
-                InputField(drenajeDebito, { drenajeDebito = it }, "Dèbit", isEditing)
-            }
+                Text("Drenatges", fontSize = 18.sp, modifier = Modifier.clickable { showDrenajesFields = !showDrenajesFields })
+                if (showDrenajesFields) {
+                    InputField(drenajeTipo, { drenajeTipo = it }, "Tipus de Drenatge", isEditing)
+                    InputField(drenajeDebito, { drenajeDebito = it }, "Dèbit", isEditing)
+                }
 
-            Text("Mobilitzacions", fontSize = 18.sp, modifier = Modifier.clickable { showMobilizacionesFields = !showMobilizacionesFields })
-            if (showMobilizacionesFields) {
-                InputField(sedestacion, { sedestacion = it }, "Sedestació", isEditing)
-                InputField(selectedDeambulacion, { selectedDeambulacion = it }, "Tipus de deambulació", isEditing)
-                InputField(cambiosPosturales, { cambiosPosturales = it }, "Canvis posturals", isEditing)
-            }
+                Text("Mobilitzacions", fontSize = 18.sp, modifier = Modifier.clickable { showMobilizacionesFields = !showMobilizacionesFields })
+                if (showMobilizacionesFields) {
+                    InputField(sedestacion, { sedestacion = it }, "Sedestació", isEditing)
+                    InputField(selectedDeambulacion, { selectedDeambulacion = it }, "Tipus de deambulació", isEditing)
+                    InputField(cambiosPosturales, { cambiosPosturales = it }, "Canvis posturals", isEditing)
+                }
 
-            InputField(observaciones, { observaciones = it }, "Observacions", isEditing)
+                InputField(observaciones, { observaciones = it }, "Observacions", isEditing)
 
-            if (isEditing) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { isEditing = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Guardar")
+                if (isEditing) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { isEditing = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Guardar")
+                    }
                 }
             }
         }

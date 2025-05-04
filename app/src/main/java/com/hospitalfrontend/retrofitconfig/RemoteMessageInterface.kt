@@ -2,6 +2,7 @@ package com.hospitalfrontend.retrofitconfig
 
 import com.hospitalfrontend.model.Care
 import com.hospitalfrontend.model.CareResponse
+import com.hospitalfrontend.model.CreateCare
 import com.hospitalfrontend.model.DiagnosisResponse
 import com.hospitalfrontend.model.Nurse
 import com.hospitalfrontend.model.NurseResponse
@@ -18,7 +19,6 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
-import java.sql.Wrapper
 
 
 interface RemoteMessageInterface {
@@ -68,5 +68,9 @@ interface RemoteMessageInterface {
 
     @GET("/care/{id}")
     suspend fun getCareById(@Path("id") id: Int): Response<Care>
+
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    @POST("/care")
+    suspend fun createCare(@Body care: CreateCare): Response<RemoteMessage>
 
 }
