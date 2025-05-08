@@ -68,7 +68,7 @@ fun NurseLoginScreen(
 
                 // Título
                 Text(
-                    text = "Bienvenido!",
+                    text = "Benvingut!",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF2C3E50),
@@ -83,7 +83,7 @@ fun NurseLoginScreen(
                         username = it
                         isError = false
                     },
-                    label = { Text("Usuario") },
+                    label = { Text("Usuari") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -142,7 +142,7 @@ fun NurseLoginScreen(
                 // Mensaje de error si el login falla
                 if (nurseLoginUiState is NurseLoginUiState.Error) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("No existe este usuario", color = Color.Red)
+                    Text("No existeix aquest usuari", color = Color.Red)
                 }
             }
         }

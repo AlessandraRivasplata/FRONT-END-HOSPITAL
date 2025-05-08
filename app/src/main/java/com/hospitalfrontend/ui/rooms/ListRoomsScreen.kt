@@ -63,7 +63,7 @@ fun ListRoomScreen(navController: NavController, listRoomsViewModel: ListRoomsVi
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Habitaciones",
+                        text = "Habitacions",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF2C3E50)
@@ -89,7 +89,7 @@ fun ListRoomScreen(navController: NavController, listRoomsViewModel: ListRoomsVi
                         }
                         is RoomsUiState.Error -> {
                             Text(
-                                text = "Error al cargar las habitaciones",
+                                text = "Error en carregar les habitacions",
                                 color = Color.Red,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -120,13 +120,13 @@ fun RoomItem(room: Room, onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Habitación ${room.roomNumber}",
+                text = "Habitació ${room.roomNumber}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = "Piso ${room.floor}",
+                text = "Pis ${room.floor}",
                 fontSize = 18.sp,
                 color = Color.Gray,
                 fontWeight = FontWeight.Bold,

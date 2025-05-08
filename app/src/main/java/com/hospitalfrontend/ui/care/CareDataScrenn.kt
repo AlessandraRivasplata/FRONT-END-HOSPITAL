@@ -72,9 +72,9 @@ fun CareDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-                    DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
-                    DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
-                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data/$patientId") }
+                    DrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
+                    DrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
+                    DrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
@@ -164,9 +164,9 @@ fun CareDataScreen(
             careId = care.idCare,
             patientId = patientId ?: "",
             name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
-            specialty = "Presión: ${care.systolicBp}/${care.diastolicBp} mmHg | Pulso: ${care.pulse} bpm",
-            status = "Sat. Oxígeno: ${care.oxygenSaturation}%",
-            location = "Enfermera: ${care.nurse.name}",
+            specialty = "Pressió: ${care.systolicBp}/${care.diastolicBp} mmHg | Pols: ${care.pulse} bpm",
+            status = "Sat. Oxigen: ${care.oxygenSaturation}%",
+            location = "Infermera: ${care.nurse.name}",
             dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
             type = "Nota: ${care.note}",
             navController = navController
@@ -269,7 +269,7 @@ fun CareDataCard(
                     .width(100.dp)
             ) {
                 Text(
-                    text = "DETALLE",
+                    text = "DETALL",
                     fontSize = 12.sp,
                     color = Color.White
                 )

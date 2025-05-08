@@ -75,7 +75,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "HABITACIÓN $roomNumber",
+                                    text = "HABITACIÓ $roomNumber",
                                     fontSize = 28.sp, // Larger font size like ListRoomScreen
                                     fontWeight = FontWeight.Bold, // Bold like ListRoomScreen
                                     color = Color(0xFF2C3E50) // Same title color
@@ -86,7 +86,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Volver",
+                                    contentDescription = "Tornar",
                                     modifier = Modifier.size(25.dp),
                                     tint = Color.Black
                                 )
@@ -119,7 +119,7 @@ fun ListPatients(navController: NavController, roomNumber: String?, viewModel: L
                         }
                         is PatientsUiState.Error -> {
                             Text(
-                                text = "Error al cargar los pacientes",
+                                text = "Error en carregar els pacients",
                                 color = Color.Red,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold

@@ -41,7 +41,7 @@ fun PersonalDataScreen(
     // Obtenemos el paciente desde el ViewModel
     val patient by viewModel.patient.collectAsState()
 
-    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'usuari"
 
     // Llamamos a la API cuando la pantalla se carga
     LaunchedEffect(patientId) {
@@ -92,9 +92,9 @@ fun PersonalDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-                    DrawerItem("Datos Médicos") { navController.navigate("medical_data/$patientId") }
-                    DrawerItem("Datos Personales") { navController.navigate("personal_data/$patientId") }
-                    DrawerItem("Datos de Cuidado") { navController.navigate("care_data/$patientId") }
+                    DrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
+                    DrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
+                    DrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
@@ -117,7 +117,7 @@ fun PersonalDataScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "DATOS PERSONALES",
+                                text = "DADES PERSONALS",
                                 fontSize = 20.sp,
                                 color = Color.Black,
                                 style = MaterialTheme.typography.titleLarge
@@ -176,16 +176,16 @@ fun PersonalDataScreen(
                         .clickable { /* Acción para cambiar la imagen */ }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                InputField(value = nombre, onValueChange = { nombre = it }, label = "Nombre", enabled = isEditing)
-                InputField(value = apellido, onValueChange = { apellido = it }, label = "Apellidos", enabled = isEditing)
-                InputField(value = fechaNacimiento, onValueChange = { fechaNacimiento = it }, label = "Fecha de nacimiento", enabled = isEditing)
-                InputField(value = direccion, onValueChange = { direccion = it }, label = "Dirección", enabled = isEditing)
-                InputField(value = lengua, onValueChange = { lengua = it }, label = "Lengua", enabled = isEditing)
-                InputField(value = antecedentes, onValueChange = { antecedentes = it }, label = "Antecedentes médicos", enabled = isEditing)
-                InputField(value = alergias, onValueChange = { alergias = it }, label = "Alergias", enabled = isEditing)
+                InputField(value = nombre, onValueChange = { nombre = it }, label = "Nom", enabled = isEditing)
+                InputField(value = apellido, onValueChange = { apellido = it }, label = "Cognoms", enabled = isEditing)
+                InputField(value = fechaNacimiento, onValueChange = { fechaNacimiento = it }, label = "Data de naixement", enabled = isEditing)
+                InputField(value = direccion, onValueChange = { direccion = it }, label = "Direcció", enabled = isEditing)
+                InputField(value = lengua, onValueChange = { lengua = it }, label = "Llengua", enabled = isEditing)
+                InputField(value = antecedentes, onValueChange = { antecedentes = it }, label = "Antecedents mèdics", enabled = isEditing)
+                InputField(value = alergias, onValueChange = { alergias = it }, label = "Al·lèrgies", enabled = isEditing)
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(text = "Información Familiar", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                InputField(value = familiarInfo, onValueChange = { familiarInfo = it }, label = "Información del familiar", enabled = isEditing)
+                Text(text = "Informació Familiar", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                InputField(value = familiarInfo, onValueChange = { familiarInfo = it }, label = "Informació del familiar", enabled = isEditing)
                 Spacer(modifier = Modifier.height(20.dp))
                 if (isEditing) {
                     Button(
