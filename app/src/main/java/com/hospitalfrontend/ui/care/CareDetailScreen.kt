@@ -167,6 +167,21 @@ fun CareDetailScreen(
                         }
                     },
                     actions = {
+                        Button(
+                            onClick = { navController.navigate("add_care/$patientId") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF00695C),
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .height(36.dp)
+                        ) {
+                            Text(
+                                text = "Crear",
+                                fontSize = 14.sp
+                            )
+                        }
                         TextButton(onClick = { isEditing = !isEditing }) {
                             Text(
                                 text = if (isEditing) "Cancelar" else "Editar",
@@ -193,9 +208,6 @@ fun CareDetailScreen(
                         .size(150.dp)
                         .clickable { }
                 )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
 
                 Spacer(modifier = Modifier.height(20.dp))
 

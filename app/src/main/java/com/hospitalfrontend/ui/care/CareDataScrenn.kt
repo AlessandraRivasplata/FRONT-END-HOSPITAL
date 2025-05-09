@@ -129,12 +129,20 @@ fun CareDataScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navController.navigate("add_care/$patientId") }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.crear2_hospital),
-                                contentDescription = "Crear",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color.Unspecified
+                        // Reemplazo IconButton por Button verde estilo "DETALL"
+                        Button(
+                            onClick = { navController.navigate("add_care/$patientId") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF00695C), // Verde igual al botón DETALL
+                                contentColor = Color.White // Texto blanco
+                            ),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .height(36.dp) // Tamaño ajustado para TopAppBar
+                        ) {
+                            Text(
+                                text = "Crear",
+                                fontSize = 14.sp // Tamaño de texto ajustado
                             )
                         }
                     }
@@ -149,7 +157,7 @@ fun CareDataScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Imagen arriba
+                // Resto del código sin cambios
                 Image(
                     painter = painterResource(id = R.drawable.historial_icono),
                     contentDescription = "Imagen de cabecera",
@@ -158,22 +166,21 @@ fun CareDataScreen(
                         .padding(bottom = 16.dp)
                 )
 
-                // Mostramos todas las tarjetas con los datos reales
-    cares.forEach { care ->
-        CareDataCard(
-            careId = care.idCare,
-            patientId = patientId ?: "",
-            name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
-            specialty = "Pressió: ${care.systolicBp}/${care.diastolicBp} mmHg | Pols: ${care.pulse} bpm",
-            status = "Sat. Oxigen: ${care.oxygenSaturation}%",
-            location = "Infermera: ${care.nurse.name}",
-            dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
-            type = "Nota: ${care.note}",
-            navController = navController
-        )
-    }
-}
-}
+                cares.forEach { care ->
+                    CareDataCard(
+                        careId = care.idCare,
+                        patientId = patientId ?: "",
+                        name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
+                        specialty = "Pressió: ${care.systolicBp}/${care.diastolicBp} mmHg | Pols: ${care.pulse} bpm",
+                        status = "Sat. Oxigen: ${care.oxygenSaturation}%",
+                        location = "Infermera: ${care.nurse.name}",
+                        dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
+                        type = "Nota: ${care.note}",
+                        navController = navController
+                    )
+                }
+            }
+        }
 }
 }
 
