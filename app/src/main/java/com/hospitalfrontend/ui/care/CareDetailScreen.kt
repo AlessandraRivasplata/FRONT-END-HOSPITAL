@@ -114,9 +114,9 @@ fun CareDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(20.dp))
-                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
                     MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
-                    MedicalDrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
+                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
+                    MedicalDrawerItem("Registre de cures") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { navController.navigate("list_rooms") }) {
                         Icon(
