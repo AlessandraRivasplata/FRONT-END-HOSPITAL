@@ -211,9 +211,6 @@ fun CareDetailScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-
-                Spacer(modifier = Modifier.height(20.dp))
-
                 Text("Constants Vitals", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
 
                 Text("Pressió Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })

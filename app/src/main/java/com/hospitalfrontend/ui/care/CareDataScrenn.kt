@@ -166,22 +166,21 @@ fun CareDataScreen(
                         .padding(bottom = 16.dp)
                 )
 
-                // Mostramos todas las tarjetas con los datos reales
-    cares.forEach { care ->
-        CareDataCard(
-            careId = care.idCare,
-            patientId = patientId ?: "",
-            name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
-            specialty = "Pressió: ${care.systolicBp}/${care.diastolicBp} mmHg | Pols: ${care.pulse} bpm",
-            status = "Sat. Oxigen: ${care.oxygenSaturation}%",
-            location = "Infermera: ${care.nurse.name}",
-            dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
-            type = "Nota: ${care.note}",
-            navController = navController
-        )
-    }
-}
-}
+                cares.forEach { care ->
+                    CareDataCard(
+                        careId = care.idCare,
+                        patientId = patientId ?: "",
+                        name = "${care.patient.surname.uppercase()}, ${care.patient.name.uppercase()}",
+                        specialty = "Pressió: ${care.systolicBp}/${care.diastolicBp} mmHg | Pols: ${care.pulse} bpm",
+                        status = "Sat. Oxigen: ${care.oxygenSaturation}%",
+                        location = "Infermera: ${care.nurse.name}",
+                        dateTime = care.recordedAt.replace("T", " ").substringBefore("."),
+                        type = "Nota: ${care.note}",
+                        navController = navController
+                    )
+                }
+            }
+        }
 }
 }
 
