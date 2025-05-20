@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +87,7 @@ fun AddCaresScreen(
                     MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
                     MedicalDrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { /* Acción para salir */ }) {
+                    IconButton(onClick = { navController.navigate("list_rooms") }) {
                         Icon(
                             painter = painterResource(id = R.drawable.log_out_icono),
                             contentDescription = "Sortir",
@@ -112,21 +114,13 @@ fun AddCaresScreen(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.flecha_atras),
-                                    contentDescription = "Tornar",
-                                    modifier = Modifier.size(25.dp),
-                                    tint = Color.Unspecified
-                                )
-                            }
                             Spacer(modifier = Modifier.width(16.dp))
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.menu_icono),
-                                    contentDescription = "Obrir menú",
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menú desplegable",
                                     modifier = Modifier.size(25.dp),
-                                    tint = Color.Unspecified
+                                    tint = Color(0xFF00695C)
                                 )
                             }
                         }
