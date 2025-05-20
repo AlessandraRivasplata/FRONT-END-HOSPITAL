@@ -41,7 +41,7 @@ fun MedicalDataScreen(
     // Obtenemos el estado y los datos del ViewModel
     val diagnosisState by medicalDataViewModel.medicalDataUiState.collectAsState()
     val diagnosisData by medicalDataViewModel.diagnosis.collectAsState()
-    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'Usuari"
 
     // Hacer la consulta cuando se llega a la pantalla
     LaunchedEffect(patientId) {
@@ -72,9 +72,9 @@ fun MedicalDataScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
                     MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
-                    MedicalDrawerItem("Historial de Cures") { navController.navigate("care_data/$patientId") }
+                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
+                    MedicalDrawerItem("Registre de cures") { navController.navigate("care_data/$patientId") }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { /* Acción para salir */ }) {
                         Icon(
