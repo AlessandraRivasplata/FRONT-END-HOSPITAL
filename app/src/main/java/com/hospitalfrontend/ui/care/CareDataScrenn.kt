@@ -166,7 +166,7 @@ fun CareDataScreen(
                         .padding(bottom = 16.dp)
                 )
 
-                cares.forEach { care ->
+                cares.reversed().forEach { care ->
                     CareDataCard(
                         careId = care.idCare,
                         patientId = patientId ?: "",
