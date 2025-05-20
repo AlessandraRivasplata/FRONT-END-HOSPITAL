@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,7 +52,7 @@ fun AddCaresScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
+    val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom  d'Usuari"
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -227,17 +229,20 @@ fun AddCaresScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("AFEGIR CURES", fontSize = 20.sp, color = Color.Black)
-                        }
+                        Text(
+                            text = "AFEGIR CURES",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF00695C),
+                            fontStyle = FontStyle.Italic,
+                            textAlign = TextAlign.Center
+                        )
                     },
                     navigationIcon = {
                         Row(
+                            horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(onClick = { navController.popBackStack() }) {
@@ -826,7 +831,7 @@ fun AddCaresScreen(
                                     InputField(
                                         value = sedestacion,
                                         onValueChange = { sedestacion = it },
-                                        label = "Sedestación"
+                                        label = "Sedestació"
                                     )
                                     Text(
                                         "Deambulació",
@@ -904,7 +909,7 @@ fun AddCaresScreen(
                                     InputField(
                                         value = cambiosPosturales,
                                         onValueChange = { cambiosPosturales = it },
-                                        label = "Cambios Posturales"
+                                        label = "Cavis Posturals"
                                     )
                                 }
                             }
@@ -924,7 +929,7 @@ fun AddCaresScreen(
                             InputField(
                                 value = observaciones,
                                 onValueChange = { observaciones = it },
-                                label = "Observaciones",
+                                label = "Observacions",
                                 singleLine = false,
                                 modifier = Modifier.height(100.dp)
                             )

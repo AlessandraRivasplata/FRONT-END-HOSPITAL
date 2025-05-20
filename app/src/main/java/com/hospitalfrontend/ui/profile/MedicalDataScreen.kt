@@ -2,6 +2,7 @@ package com.hospitalfrontend.ui.profile
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,7 +59,9 @@ fun MedicalDataScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = Color(0xFFE0F2F1)
+            ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -65,22 +70,52 @@ fun MedicalDataScreen(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.medico_menu),
-                        contentDescription = "Imagen del menú",
-                        modifier = Modifier.size(150.dp)
+                        contentDescription = "Imatge del menú",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .padding(top = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = nurseName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        ),
+                        color = Color(0xFF004D40)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
-                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
-                    MedicalDrawerItem("Registre de cures") { navController.navigate("care_data/$patientId") }
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    MedicalDrawerItem("Dades Personals") {
+                        navController.navigate("personal_data/$patientId")
+                    }
+                    MedicalDrawerItem("Dades Mèdiques") {
+                        navController.navigate("medical_data/$patientId")
+                    }
+                    MedicalDrawerItem("Registre de cures") {
+                        navController.navigate("care_data/$patientId")
+                    }
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { navController.navigate("list_rooms") }) {
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clickable { navController.navigate("list_rooms") }
+                            .padding(12.dp)
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.log_out_icono),
-                            contentDescription = "Salir",
-                            modifier = Modifier.size(40.dp),
+                            contentDescription = "Sortir",
+                            modifier = Modifier.size(24.dp),
                             tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Sortir",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = Color(0xFF004D40)
                         )
                     }
                 }
@@ -89,19 +124,16 @@ fun MedicalDataScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "DADES MÈDIQUES",
-                                fontSize = 20.sp,
-                                color = Color.Black,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
+                        Text(
+                            text = "DADES MÈDIQUES",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF00695C),
+                            fontStyle = FontStyle.Italic,
+                            textAlign = TextAlign.Center
+                        )
                     },
                     navigationIcon = {
                         Row(
@@ -126,7 +158,6 @@ fun MedicalDataScreen(
                             }
                         }
                     }
-
                 )
             }
         ) { paddingValues ->
@@ -262,8 +293,16 @@ fun MedicalDrawerItem(text: String, onClick: () -> Unit) {
 fun InputField(value: String, label: String, enabled: Boolean) {
     OutlinedTextField(
         value = value,
-        onValueChange = { /* No editable, por lo que no se actualiza */ },
-        label = { Text(label) },
+        onValueChange = {},
+        label = {
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+        }
+
+        ,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
