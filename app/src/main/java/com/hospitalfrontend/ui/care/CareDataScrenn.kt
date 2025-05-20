@@ -129,12 +129,20 @@ fun CareDataScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navController.navigate("add_care/$patientId") }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.crear2_hospital),
-                                contentDescription = "Crear",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color.Unspecified
+                        // Reemplazo IconButton por Button verde estilo "DETALL"
+                        Button(
+                            onClick = { navController.navigate("add_care/$patientId") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF00695C), // Verde igual al botón DETALL
+                                contentColor = Color.White // Texto blanco
+                            ),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .height(36.dp) // Tamaño ajustado para TopAppBar
+                        ) {
+                            Text(
+                                text = "Crear",
+                                fontSize = 14.sp // Tamaño de texto ajustado
                             )
                         }
                     }
