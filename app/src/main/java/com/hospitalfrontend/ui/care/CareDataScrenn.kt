@@ -157,7 +157,7 @@ fun CareDataScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Imagen arriba
+                // Resto del código sin cambios
                 Image(
                     painter = painterResource(id = R.drawable.historial_icono),
                     contentDescription = "Imagen de cabecera",
