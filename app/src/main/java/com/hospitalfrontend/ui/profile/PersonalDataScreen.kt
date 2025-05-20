@@ -27,6 +27,8 @@ import com.hospitalfrontend.model.Patient
 import com.hospitalfrontend.ui.profile.PatientDataViewModel
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.ArrowBack
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,7 +134,14 @@ fun PersonalDataScreen(
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(modifier = Modifier.width(16.dp))
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Tornar enrere",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Color(0xFF00695C)
+                                )
+                            }
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
@@ -143,7 +152,8 @@ fun PersonalDataScreen(
                             }
                         }
                     },
-                    actions = {
+
+                            actions = {
                         TextButton(onClick = { isEditing = !isEditing }) {
                             Text(
                                 text = if (isEditing) "Cancelar" else "Editar",

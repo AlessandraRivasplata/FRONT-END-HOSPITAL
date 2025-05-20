@@ -1,15 +1,18 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,6 +52,7 @@ fun AddCaresScreen(
     val scope = rememberCoroutineScope()
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Estados para secciones colapsables
     var showVitalSigns by remember { mutableStateOf(true) }
@@ -82,6 +86,14 @@ fun AddCaresScreen(
     var systolicError by remember { mutableStateOf<String?>(null) }
     var diastolicError by remember { mutableStateOf<String?>(null) }
     var tempError by remember { mutableStateOf<String?>(null) }
+    var respiratoryError by remember { mutableStateOf<String?>(null) }
+    var pulseError by remember { mutableStateOf<String?>(null) }
+    var oxygenError by remember { mutableStateOf<String?>(null) }
+
+    // Estado para la alerta
+    val mediaPlayerState = remember { mutableStateOf<MediaPlayer?>(null) }
+    var showAlert by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
 
     // Opciones para desplegables
     val higieneOptions = listOf("Aïllat", "Parcial al llit", "Dutxa amb ajuda", "Dutxa sense ajuda", "Autònom")
@@ -96,10 +108,63 @@ fun AddCaresScreen(
     val deambulacionOptions = listOf("Sí", "No")
     val deambulacionTypeOptions = listOf("Amb bastó", "Amb caminador", "Amb ajuda física")
 
+    // Función para reproducir sonido de alarma
+    fun playAlarmSound(mediaPlayerState: MutableState<MediaPlayer?>) {
+        Log.d("AlarmSound", "Intentant reproduir el so sonida_alerta.mp3")
+        // Atura i allibera qualsevol MediaPlayer existent per evitar fuites
+        mediaPlayerState.value?.stop()
+        mediaPlayerState.value?.release()
+        mediaPlayerState.value = null
+
+        val mediaPlayer = MediaPlayer.create(context, R.raw.sonida_alerta)
+        if (mediaPlayer == null) {
+            Log.e("AlarmSound", "Error: No s'ha pogut crear el MediaPlayer. Comprova el fitxer a res/raw/sonida_alerta.mp3.")
+            return
+        }
+        try {
+            mediaPlayer.setVolume(1.0f, 1.0f) // Volum al màxim
+            mediaPlayer.isLooping = true // Activa el bucle
+            mediaPlayer.start()
+            Log.d("AlarmSound", "So iniciat en bucle")
+            mediaPlayerState.value = mediaPlayer // Guarda la referència
+        } catch (e: Exception) {
+            Log.e("AlarmSound", "Error en iniciar el so: ${e.message}")
+            mediaPlayer.release()
+        }
+    }
+
+    // Diálogo de alerta
+    if (showAlert) {
+        AlertDialog(
+            onDismissRequest = {
+                // Atura el so quan es tanqui el diàleg
+                mediaPlayerState.value?.stop()
+                mediaPlayerState.value?.release()
+                mediaPlayerState.value = null
+                showAlert = false
+            },
+            title = { Text("Alerta de Constants Vitals") },
+            text = { Text(alertMessage) },
+            confirmButton = {
+                TextButton(onClick = {
+                    // Atura el so quan es premi "D'acord"
+                    mediaPlayerState.value?.stop()
+                    mediaPlayerState.value?.release()
+                    mediaPlayerState.value = null
+                    showAlert = false
+                }) {
+                    Text("D'acord")
+                }
+            }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = Color(0xFFE0F2F1)
+            ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -109,21 +174,51 @@ fun AddCaresScreen(
                     Image(
                         painter = painterResource(id = R.drawable.medico_menu),
                         contentDescription = "Imatge del menú",
-                        modifier = Modifier.size(150.dp)
+                        modifier = Modifier
+                            .size(120.dp)
+                            .padding(top = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = nurseName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        ),
+                        color = Color(0xFF004D40)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(nurseName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    MedicalDrawerItem("Dades Personals") { navController.navigate("personal_data/$patientId") }
-                    MedicalDrawerItem("Dades Mèdiques") { navController.navigate("medical_data/$patientId") }
-                    MedicalDrawerItem("Registre de cures") { navController.navigate("care_data/$patientId") }
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    MedicalDrawerItem("Dades Personals") {
+                        navController.navigate("personal_data/$patientId")
+                    }
+                    MedicalDrawerItem("Dades Mèdiques") {
+                        navController.navigate("medical_data/$patientId")
+                    }
+                    MedicalDrawerItem("Registre de cures") {
+                        navController.navigate("care_data/$patientId")
+                    }
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { navController.navigate("list_rooms") }) {
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clickable { navController.navigate("list_rooms") }
+                            .padding(12.dp)
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.log_out_icono),
                             contentDescription = "Sortir",
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Sortir",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = Color(0xFF004D40)
                         )
                     }
                 }
@@ -145,7 +240,14 @@ fun AddCaresScreen(
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(modifier = Modifier.width(16.dp))
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Tornar enrere",
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Color(0xFF00695C)
+                                )
+                            }
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
@@ -161,21 +263,81 @@ fun AddCaresScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        // Validaciones antes de guardar
-                        systolicError = if (tensionSistolica.text.isNotEmpty() && tensionSistolica.text.toIntOrNull() !in 50..250) {
-                            "Rang no vàlid (50-250)"
-                        } else null
-                        diastolicError = if (tensionDiastolica.text.isNotEmpty() && tensionDiastolica.text.toIntOrNull() !in 30..150) {
-                            "Rang no vàlid (30-150)"
-                        } else null
+                        // Validacions de rangs bàsics
+                        systolicError =
+                            if (tensionSistolica.text.isNotEmpty() && tensionSistolica.text.toIntOrNull() !in 50..250) {
+                                "Rang no vàlid (50-250)"
+                            } else null
+                        diastolicError =
+                            if (tensionDiastolica.text.isNotEmpty() && tensionDiastolica.text.toIntOrNull() !in 30..150) {
+                                "Rang no vàlid (30-150)"
+                            } else null
                         tempError = if (temperatura.text.isNotEmpty()) {
                             val tempValue = temperatura.text.toDoubleOrNull()
                             if (tempValue != null && tempValue !in 34.0..42.0) {
                                 "Rang no vàlid (34-42)"
                             } else null
                         } else null
-                        if (systolicError == null && diastolicError == null && tempError == null) {
-                            val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                        respiratoryError =
+                            if (frecuenciaRespiratoria.text.isNotEmpty() && frecuenciaRespiratoria.text.toIntOrNull() !in 0..100) {
+                                "Rang no vàlid (0-100)"
+                            } else null
+                        pulseError =
+                            if (pulso.text.isNotEmpty() && pulso.text.toIntOrNull() !in 0..200) {
+                                "Rang no vàlid (0-200)"
+                            } else null
+                        oxygenError = if (saturacionOxigeno.text.isNotEmpty()) {
+                            val oxygenValue = saturacionOxigeno.text.toDoubleOrNull()
+                            if (oxygenValue != null && oxygenValue !in 0.0..100.0) {
+                                "Rang no vàlid (0-100)"
+                            } else null
+                        } else null
+
+                        // Validacions d'alarmes
+                        val alerts = mutableListOf<String>()
+                        tensionSistolica.text.toIntOrNull()?.let {
+                            if (it > 140 || it < 90) {
+                                alerts.add("Tensió Sistòlica fora de rang: $it (Límit: 90-140)")
+                            }
+                        }
+                        tensionDiastolica.text.toIntOrNull()?.let {
+                            if (it >= 90 || it < 50) {
+                                alerts.add("Tensió Diastòlica fora de rang: $it (Límit: 50-<90)")
+                            }
+                        }
+                        frecuenciaRespiratoria.text.toIntOrNull()?.let {
+                            if (it > 20 || it < 12) {
+                                alerts.add("Freqüència Respiratòria fora de rang: $it (Límit: 12-20)")
+                            }
+                        }
+                        pulso.text.toIntOrNull()?.let {
+                            if (it > 100 || it < 50) {
+                                alerts.add("Pols fora de rang: $it (Límit: 50-100)")
+                            }
+                        }
+                        temperatura.text.toDoubleOrNull()?.let {
+                            if (it > 38.5 || it < 34.9) {
+                                alerts.add("Temperatura fora de rang: $it°C (Límit: 34.9-38.5)")
+                            }
+                        }
+                        saturacionOxigeno.text.toDoubleOrNull()?.let {
+                            if (it < 94.0) {
+                                alerts.add("Saturació d'Oxigen fora de rang: $it% (Límit: ≥94%)")
+                            }
+                        }
+
+                        if (alerts.isNotEmpty()) {
+                            alertMessage = alerts.joinToString("\n")
+                            showAlert = true
+                            playAlarmSound(mediaPlayerState) // Passa la variable mediaPlayerState
+                        }
+
+                        // Continuar amb el desat si no hi ha errors de validació
+                        if (systolicError == null && diastolicError == null && tempError == null &&
+                            respiratoryError == null && pulseError == null && oxygenError == null
+                        ) {
+                            val formatter =
+                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
                             val recordedAt = formatter.format(Date())
 
                             val jsonData = CreateCare(
@@ -211,7 +373,7 @@ fun AddCaresScreen(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.guardar_icono),
-                        contentDescription = "Guardar",
+                        contentDescription = "Desar",
                         modifier = Modifier.size(16.dp),
                         tint = Color.Unspecified
                     )
@@ -279,7 +441,7 @@ fun AddCaresScreen(
                                     InputField(
                                         value = tensionDiastolica,
                                         onValueChange = { tensionDiastolica = it },
-                                        label = "Presión Diastólica",
+                                        label = "Pressió Diastòlica",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         error = diastolicError
                                     )
@@ -287,13 +449,15 @@ fun AddCaresScreen(
                                         value = frecuenciaRespiratoria,
                                         onValueChange = { frecuenciaRespiratoria = it },
                                         label = "Freqüència Respiratòria",
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        error = respiratoryError
                                     )
                                     InputField(
                                         value = pulso,
                                         onValueChange = { pulso = it },
                                         label = "Pols",
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        error = pulseError
                                     )
                                     InputField(
                                         value = temperatura,
@@ -306,7 +470,8 @@ fun AddCaresScreen(
                                         value = saturacionOxigeno,
                                         onValueChange = { saturacionOxigeno = it },
                                         label = "Saturació d'Oxigen",
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                        error = oxygenError
                                     )
                                 }
                             }
@@ -465,7 +630,6 @@ fun AddCaresScreen(
                             }
                             if (showDieta) {
                                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                                    // Subsección Texturas
                                     Text(
                                         "Textures",
                                         fontSize = 16.sp,
@@ -504,8 +668,6 @@ fun AddCaresScreen(
                                             }
                                         }
                                     }
-
-                                    // Subsección Tipus de dieta
                                     Text(
                                         "Tipus de dieta",
                                         fontSize = 16.sp,
@@ -547,8 +709,6 @@ fun AddCaresScreen(
                                             }
                                         }
                                     }
-
-                                    // Subsección Autonomia alimentària
                                     Text(
                                         "Autonomia alimentària",
                                         fontSize = 16.sp,
@@ -587,8 +747,6 @@ fun AddCaresScreen(
                                             }
                                         }
                                     }
-
-                                    // Subsección Portador de pròtesis
                                     Text(
                                         "Portador de pròtesis",
                                         fontSize = 16.sp,
@@ -633,7 +791,6 @@ fun AddCaresScreen(
                     }
                 }
 
-
                 // Sección Movilizaciones
                 item {
                     Card(
@@ -666,14 +823,11 @@ fun AddCaresScreen(
                             }
                             if (showMobilizations) {
                                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                                    // Subsección Sedestación
                                     InputField(
                                         value = sedestacion,
                                         onValueChange = { sedestacion = it },
                                         label = "Sedestación"
                                     )
-
-                                    // Subsección Deambulació
                                     Text(
                                         "Deambulació",
                                         fontSize = 16.sp,
@@ -713,8 +867,6 @@ fun AddCaresScreen(
                                             }
                                         }
                                     }
-
-                                    // Subsección Deambulació Tipo (si Sí)
                                     if (selectedDeambulacion == "Sí") {
                                         var expandedDeambulacionType by remember { mutableStateOf(false) }
                                         ExposedDropdownMenuBox(
@@ -749,8 +901,6 @@ fun AddCaresScreen(
                                             }
                                         }
                                     }
-
-                                    // Subsección Cambios Posturales
                                     InputField(
                                         value = cambiosPosturales,
                                         onValueChange = { cambiosPosturales = it },
@@ -786,7 +936,6 @@ fun AddCaresScreen(
     }
 }
 
-// Componente reutilizable para campos de entrada con soporte para errores
 @Composable
 fun InputField(
     value: TextFieldValue,
