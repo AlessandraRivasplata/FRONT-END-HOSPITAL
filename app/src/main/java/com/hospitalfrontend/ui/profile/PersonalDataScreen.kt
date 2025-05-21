@@ -41,24 +41,19 @@ fun PersonalDataScreen(
     viewModel: PatientDataViewModel = viewModel(),
     nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
-    var isEditing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-
-    // Obtenemos el paciente desde el ViewModel
     val patient by viewModel.patient.collectAsState()
 
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'usuari"
 
-    // Llamamos a la API cuando la pantalla se carga
     LaunchedEffect(patientId) {
         patientId?.toIntOrNull()?.let { id ->
             viewModel.getPatientById(id)
         }
     }
 
-    // Variables para los campos
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
     var apellido by remember { mutableStateOf(TextFieldValue("")) }
     var fechaNacimiento by remember { mutableStateOf(TextFieldValue("")) }
@@ -68,7 +63,6 @@ fun PersonalDataScreen(
     var alergias by remember { mutableStateOf(TextFieldValue("")) }
     var familiarInfo by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Cuando el paciente cambia, actualizamos los campos
     LaunchedEffect(patient) {
         patient?.let {
             nombre = TextFieldValue(it.name)
@@ -83,75 +77,86 @@ fun PersonalDataScreen(
     }
 
     ModalNavigationDrawer(
-        drawerState = drawerState, //
+        drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color(0xFFE0F2F1) //
+                drawerContainerColor = Color(0xFFE0F2F1)
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally, //
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .fillMaxSize() //
-                        .padding(16.dp) //
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.medico_menu), //
-                        contentDescription = "Imatge del menú", //
+                        painter = painterResource(id = R.drawable.medico_menu),
+                        contentDescription = "Imatge del menú",
                         modifier = Modifier
-                            .size(120.dp) //
-                            .padding(top = 8.dp) //
+                            .size(120.dp)
+                            .padding(top = 8.dp)
                             .clickable {
                                 scope.launch { drawerState.close() }
                                 navController.navigate("nurse_profile")
                             }
                     )
-                    Spacer(modifier = Modifier.height(8.dp)) //
                     Text(
-                        text = nurseName, //
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold, //
-                            fontSize = 20.sp //
-                        ),
-                        color = Color(0xFF004D40) //
+                        text = "Edit Profile",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .clickable {
+                                scope.launch { drawerState.close() }
+                                navController.navigate("nurse_profile")
+                            }
+                            .padding(bottom = 4.dp)
                     )
-                    Spacer(modifier = Modifier.height(16.dp)) //
-                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp) //
-                    Spacer(modifier = Modifier.height(8.dp)) //
-                    MedicalDrawerItem("Dades Personals") { //
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = nurseName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        ),
+                        color = Color(0xFF004D40)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    MedicalDrawerItem("Dades Personals") {
                         scope.launch { drawerState.close() }
                         navController.navigate("personal_data/$patientId")
                     }
-                    MedicalDrawerItem("Dades Mèdiques") { //
+                    MedicalDrawerItem("Dades Mèdiques") {
                         scope.launch { drawerState.close() }
                         navController.navigate("medical_data/$patientId")
                     }
-                    MedicalDrawerItem("Registre de cures") { //
+                    MedicalDrawerItem("Registre de cures") {
                         scope.launch { drawerState.close() }
                         navController.navigate("care_data/$patientId")
                     }
-                    Spacer(modifier = Modifier.weight(1f)) //
-                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp) //
-                    Spacer(modifier = Modifier.height(8.dp)) //
+                    Spacer(modifier = Modifier.weight(1f))
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
-                        verticalAlignment = Alignment.CenterVertically, //
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clickable {
                                 scope.launch { drawerState.close() }
                                 navController.navigate("list_rooms")
-                            } //
-                            .padding(12.dp) //
+                            }
+                            .padding(12.dp)
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.log_out_icono), //
-                            contentDescription = "Sortir", //
-                            modifier = Modifier.size(24.dp), //
-                            tint = Color.Unspecified //
+                            painter = painterResource(id = R.drawable.log_out_icono),
+                            contentDescription = "Sortir",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Unspecified
                         )
-                        Spacer(modifier = Modifier.width(8.dp)) //
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Sortir", //
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), //
-                            color = Color(0xFF004D40) //
+                            text = "Sortir",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                            color = Color(0xFF004D40)
                         )
                     }
                 }
@@ -170,12 +175,11 @@ fun PersonalDataScreen(
                         ) {
                             Text(
                                 text = "DADES PERSONALS",
-                                fontSize = 24.sp, // Mida una mica més gran
-                                fontWeight = FontWeight.SemiBold, // Pes més elegant
-                                color = Color(0xFF00695C), // Mateix color que les icones per harmonia
-                                fontStyle = FontStyle.Italic, // Toc elegant amb cursiva
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF00695C),
+                                fontStyle = FontStyle.Italic,
                                 textAlign = TextAlign.Center,
-
                             )
                         }
                     },
@@ -201,16 +205,6 @@ fun PersonalDataScreen(
                                 )
                             }
                         }
-                    },
-
-                            actions = {
-                        TextButton(onClick = { isEditing = !isEditing }) {
-                            Text(
-                                text = if (isEditing) "Cancelar" else "Editar",
-                                color = Color.Black,
-                                fontSize = 18.sp
-                            )
-                        }
                     }
                 )
             }
@@ -231,25 +225,17 @@ fun PersonalDataScreen(
                         .clickable { /* Acción para cambiar la imagen */ }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                InputField(value = nombre, onValueChange = { nombre = it }, label = "Nom", enabled = isEditing)
-                InputField(value = apellido, onValueChange = { apellido = it }, label = "Cognoms", enabled = isEditing)
-                InputField(value = fechaNacimiento, onValueChange = { fechaNacimiento = it }, label = "Data de naixement", enabled = isEditing)
-                InputField(value = direccion, onValueChange = { direccion = it }, label = "Direcció", enabled = isEditing)
-                InputField(value = lengua, onValueChange = { lengua = it }, label = "Llengua", enabled = isEditing)
-                InputField(value = antecedentes, onValueChange = { antecedentes = it }, label = "Antecedents mèdics", enabled = isEditing)
-                InputField(value = alergias, onValueChange = { alergias = it }, label = "Al·lèrgies", enabled = isEditing)
+                InputField(value = nombre, onValueChange = { nombre = it }, label = "Nom", enabled = false)
+                InputField(value = apellido, onValueChange = { apellido = it }, label = "Cognoms", enabled = false)
+                InputField(value = fechaNacimiento, onValueChange = { fechaNacimiento = it }, label = "Data de naixement", enabled = false)
+                InputField(value = direccion, onValueChange = { direccion = it }, label = "Direcció", enabled = false)
+                InputField(value = lengua, onValueChange = { lengua = it }, label = "Llengua", enabled = false)
+                InputField(value = antecedentes, onValueChange = { antecedentes = it }, label = "Antecedents mèdics", enabled = false)
+                InputField(value = alergias, onValueChange = { alergias = it }, label = "Al·lèrgies", enabled = false)
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(text = "Informació Familiar", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                InputField(value = familiarInfo, onValueChange = { familiarInfo = it }, label = "Informació del familiar", enabled = isEditing)
+                InputField(value = familiarInfo, onValueChange = { familiarInfo = it }, label = "Informació del familiar", enabled = false)
                 Spacer(modifier = Modifier.height(20.dp))
-                if (isEditing) {
-                    Button(
-                        onClick = { isEditing = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Guardar")
-                    }
-                }
             }
         }
     }
