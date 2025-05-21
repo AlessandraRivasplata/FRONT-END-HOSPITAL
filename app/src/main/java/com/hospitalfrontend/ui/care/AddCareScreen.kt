@@ -61,7 +61,6 @@ fun AddCaresScreen(
     var showDrainages by remember { mutableStateOf(false) }
     var showHigiene by remember { mutableStateOf(false) }
     var showDieta by remember { mutableStateOf(false) }
-    var showProtesis by remember { mutableStateOf(false) }
     var showMobilizations by remember { mutableStateOf(false) }
 
     // Estados para campos con validación
@@ -370,7 +369,7 @@ fun AddCaresScreen(
 
                             scope.launch {
                                 createCareViewModel.createCare(jsonData)
-                                snackbarHostState.showSnackbar("Les cures s'han desat correctament")
+                                snackbarHostState.showSnackbar("La cura s'ha desat correctament")
                                 navController.popBackStack()
                             }
                         }
@@ -435,32 +434,44 @@ fun AddCaresScreen(
                                 )
                             }
                             if (showVitalSigns) {
-                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                                    InputField(
-                                        value = tensionSistolica,
-                                        onValueChange = { tensionSistolica = it },
-                                        label = "Pressió Sistòlica",
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        error = systolicError
-                                    )
+                                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                        InputField(
+                                            value = tensionSistolica,
+                                            onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                                tensionSistolica = it
+                                            } },
+                                            label = "Pressió Sistòlica",
+                                            placeholder = "90-140",
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                            error = systolicError
+                                        )
                                     InputField(
                                         value = tensionDiastolica,
-                                        onValueChange = { tensionDiastolica = it },
+                                        onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                            tensionDiastolica = it
+                                        } },
                                         label = "Pressió Diastòlica",
+                                        placeholder = "50-90",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         error = diastolicError
                                     )
                                     InputField(
                                         value = frecuenciaRespiratoria,
-                                        onValueChange = { frecuenciaRespiratoria = it },
+                                        onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                            frecuenciaRespiratoria = it
+                                        } },
                                         label = "Freqüència Respiratòria",
+                                        placeholder = "12-20",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         error = respiratoryError
                                     )
                                     InputField(
                                         value = pulso,
-                                        onValueChange = { pulso = it },
+                                        onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                            pulso = it
+                                        } },
                                         label = "Pols",
+                                        placeholder = "50-100",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         error = pulseError
                                     )
@@ -468,6 +479,7 @@ fun AddCaresScreen(
                                         value = temperatura,
                                         onValueChange = { temperatura = it },
                                         label = "Temperatura",
+                                        placeholder = "34.9-38.5",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                         error = tempError
                                     )
@@ -475,6 +487,7 @@ fun AddCaresScreen(
                                         value = saturacionOxigeno,
                                         onValueChange = { saturacionOxigeno = it },
                                         label = "Saturació d'Oxigen",
+                                        placeholder = "≥94",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                         error = oxygenError
                                     )
@@ -519,12 +532,16 @@ fun AddCaresScreen(
                                     InputField(
                                         value = drenajeTipo,
                                         onValueChange = { drenajeTipo = it },
-                                        label = "Tipus de drenatge"
+                                        label = "Tipus de drenatge",
+                                        placeholder = "rutinari, passiu...",
                                     )
                                     InputField(
                                         value = drenajeDebito,
-                                        onValueChange = { drenajeDebito = it },
+                                        onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                            drenajeDebito = it
+                                        } },
                                         label = "Débit",
+                                        placeholder = "50",
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                     )
                                 }
@@ -831,7 +848,8 @@ fun AddCaresScreen(
                                     InputField(
                                         value = sedestacion,
                                         onValueChange = { sedestacion = it },
-                                        label = "Sedestació"
+                                        label = "Sedestació",
+                                        placeholder = "Allitat, Incorporat, Cadira de rodes...",
                                     )
                                     Text(
                                         "Deambulació",
@@ -909,7 +927,8 @@ fun AddCaresScreen(
                                     InputField(
                                         value = cambiosPosturales,
                                         onValueChange = { cambiosPosturales = it },
-                                        label = "Cavis Posturals"
+                                        label = "Cavis Posturals",
+                                        placeholder = "De allitat a incorporat...",
                                     )
                                 }
                             }
@@ -930,6 +949,7 @@ fun AddCaresScreen(
                                 value = observaciones,
                                 onValueChange = { observaciones = it },
                                 label = "Observacions",
+                                placeholder = "Cura realizada sin problemas",
                                 singleLine = false,
                                 modifier = Modifier.height(100.dp)
                             )
@@ -949,13 +969,15 @@ fun InputField(
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     error: String? = null,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    placeholder: String? = null
 ) {
     Column(modifier = modifier.padding(vertical = 4.dp)) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
+            placeholder = { placeholder?.let { Text(it, color = Color.Gray.copy(alpha = 0.5f)) } },
             isError = error != null,
             keyboardOptions = keyboardOptions,
             singleLine = singleLine,
