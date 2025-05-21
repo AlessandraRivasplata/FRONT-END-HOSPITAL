@@ -29,7 +29,9 @@ class CreateCareViewModel : ViewModel() {
             try {
                 // Configuración de Retrofit para hacer la petición
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/") // Cambia la IP si es necesario
+
+                    .baseUrl("http://10.0.2.2:8080/") // Cambia la IP si es necesario //192.168.43.219:8080
+
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
