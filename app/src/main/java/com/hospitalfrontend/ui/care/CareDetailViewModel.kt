@@ -32,7 +32,9 @@ class CareDetailViewModel : ViewModel() {
             _careDetailUiState.value = CareDetailUiState.Loading
             try {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://192.168.43.219:8080/") // Ajusta la IP si cambia 10.118.3.202
+
+                    .baseUrl("http://10.0.2.2:8080/") // Ajusta la IP si cambia 10.118.3.202   //192.168.43.219:8080
+
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

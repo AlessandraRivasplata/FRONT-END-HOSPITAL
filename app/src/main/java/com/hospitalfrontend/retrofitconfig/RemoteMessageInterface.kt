@@ -24,12 +24,15 @@ import retrofit2.http.Query
 interface RemoteMessageInterface {
     @GET("/nurse/allnurses")
     suspend fun getAllNurses(): NurseResponse
-  
+
     @GET("/nurse/findnursebyname")
     suspend fun getNursesByName(@Query("name") name: String): Response<List<Nurse>>
 
     @GET("/nurse/{id}")
     suspend fun getNurseById(@Path("id") id: Int): Response<Nurse>
+
+    @GET("/nurse/profile/{id}")
+    suspend fun getNurseProfile(@Path("id") id: Int): Response<Map<String, Any>>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("/nurse")
@@ -41,15 +44,16 @@ interface RemoteMessageInterface {
     ): Response<Nurse>
 
     @DELETE("nurse/{id}")
-    suspend fun deleteNurseById(@Path("id") id: Int): Response<Unit>
+    suspend fun deleteNurseById(@Path("id") id: Int): Response<RemoteMessage> // Changed to RemoteMessage
 
+    // MODIFIED: Takes name, username, email as query parameters
     @PUT("/nurse/{id}")
     suspend fun updateNurse(
         @Path("id") id: Int,
         @Query("name") name: String,
         @Query("username") username: String,
-        @Query("password") password: String
-    ): Response<Unit>
+        @Query("email") email: String // Changed from password to email
+    ): Response<RemoteMessage> // Changed to RemoteMessage for consistent server response
 
     @GET("/room/all")
     suspend fun getAllRooms(): Response<RoomResponse>

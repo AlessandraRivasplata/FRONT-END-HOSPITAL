@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle // Icon for profile
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,69 +35,76 @@ fun ListRoomScreen(navController: NavController, listRoomsViewModel: ListRoomsVi
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF2F2F2)),
+            .background(Color(0xFFF2F2F2)), //
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(80.dp)) //
         Image(
-            painter = painterResource(id = R.drawable.hospital_bed_2775552),
-            contentDescription = "LOGO ROOM",
-            modifier = Modifier.size(150.dp)
+            painter = painterResource(id = R.drawable.hospital_bed_2775552), //
+            contentDescription = "LOGO ROOM", //
+            modifier = Modifier.size(150.dp) //
         )
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(50.dp)) //
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp),
-            contentAlignment = Alignment.TopCenter
+                .padding(bottom = 80.dp), //
+            contentAlignment = Alignment.TopCenter //
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .heightIn(max = 700.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                    .fillMaxWidth(0.85f) //
+                    .heightIn(max = 700.dp), //
+                shape = RoundedCornerShape(16.dp), //
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp), //
+                colors = CardDefaults.cardColors(containerColor = Color.White) //
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(24.dp), //
+                    horizontalAlignment = Alignment.CenterHorizontally //
                 ) {
-                    Text(
-                        text = "Habitacions",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2C3E50)
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Habitacions", //
+                            fontSize = 28.sp, //
+                            fontWeight = FontWeight.Bold, //
+                            color = Color(0xFF2C3E50), //
+                            modifier = Modifier.weight(1f) // Allow text to take available space
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp)) //
 
                     when (roomsUiState) {
-                        is RoomsUiState.Loading -> {
-                            CircularProgressIndicator()
+                        is RoomsUiState.Loading -> { //
+                            CircularProgressIndicator() //
                         }
-                        is RoomsUiState.Success -> {
+                        is RoomsUiState.Success -> { //
                             LazyColumn(
-                                contentPadding = PaddingValues(vertical = 8.dp),
-                                modifier = Modifier.heightIn(max = 550.dp)
+                                contentPadding = PaddingValues(vertical = 8.dp), //
+                                modifier = Modifier.heightIn(max = 550.dp) //
                             ) {
-                                items(rooms) { room ->
-                                    RoomItem(room = room, onClick = {
-                                        navController.navigate("list_patients/${room.roomNumber}")
+                                items(rooms) { room -> //
+                                    RoomItem(room = room, onClick = { //
+                                        navController.navigate("list_patients/${room.roomNumber}") //
                                     })
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(8.dp)) //
                                 }
                             }
                         }
-                        is RoomsUiState.Error -> {
+                        is RoomsUiState.Error -> { //
                             Text(
-                                text = "Error en carregar les habitacions",
-                                color = Color.Red,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                text = "Error en carregar les habitacions", //
+                                color = Color.Red, //
+                                fontSize = 16.sp, //
+                                fontWeight = FontWeight.Bold //
                             )
                         }
-                        else -> {}
+                        else -> {} //
                     }
                 }
             }
@@ -108,28 +117,28 @@ fun RoomItem(room: Room, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF78C9E4))
+            .clickable(onClick = onClick), //
+        shape = RoundedCornerShape(12.dp), //
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), //
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF78C9E4)) //
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(vertical = 8.dp, horizontal = 16.dp) //
+                .fillMaxWidth(), //
+            horizontalAlignment = Alignment.CenterHorizontally //
         ) {
             Text(
-                text = "Habitació ${room.roomNumber}",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                text = "Habitació ${room.roomNumber}", //
+                fontSize = 20.sp, //
+                fontWeight = FontWeight.Bold, //
+                color = Color.White //
             )
             Text(
-                text = "Pis ${room.floor}",
-                fontSize = 18.sp,
-                color = Color.Gray,
-                fontWeight = FontWeight.Bold,
+                text = "Pis ${room.floor}", //
+                fontSize = 18.sp, //
+                color = Color.Gray, //
+                fontWeight = FontWeight.Bold, //
             )
         }
     }
