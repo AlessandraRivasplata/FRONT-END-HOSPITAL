@@ -217,7 +217,7 @@ fun PersonalDataScreen(
                     painter = painterResource(id = R.drawable.personaldata_icono),
                     contentDescription = "Foto de perfil",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(100.dp)
                         .clickable { /* Acción para cambiar la imagen */ }
                 )
                 Spacer(modifier = Modifier.height(20.dp))

@@ -1,6 +1,7 @@
 package com.hospitalfrontend.navigation
 
 import AddCaresScreen
+import NurseLoginScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -10,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
 import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
-import com.hospitalfrontend.ui.authentication.NurseLoginScreen
+
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.authentication.NurseLoginViewModel

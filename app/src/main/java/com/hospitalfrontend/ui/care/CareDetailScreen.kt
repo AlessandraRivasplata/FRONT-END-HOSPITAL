@@ -231,10 +231,10 @@ fun CareDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.care_icon),
+                    painter = painterResource(id = R.drawable.vaccine_11934404),
                     contentDescription = "Foto de perfil",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(100.dp)
                         .clickable { }
                 )
 
