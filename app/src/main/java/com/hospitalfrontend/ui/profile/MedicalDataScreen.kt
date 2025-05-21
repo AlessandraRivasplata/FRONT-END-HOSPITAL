@@ -173,7 +173,7 @@ fun MedicalDataScreen(
                     painter = painterResource(id = R.drawable.medical_data_icono),
                     contentDescription = "Imagen de Datos Médicos",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(110.dp)
                         .clickable { /* Acción opcional */ }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
