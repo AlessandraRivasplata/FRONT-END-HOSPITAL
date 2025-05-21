@@ -33,7 +33,9 @@ class MedicalDataViewModel : ViewModel() {
             try {
                 val connection = Retrofit.Builder()
 
-                    .baseUrl("http://10.0.2.2:8080/")//Alessandra ip:10.0.2.2:8081
+
+                    .baseUrl("http://10.0.2.2:8080/")//Alessandra ip:10.0.2.2:8081    //192.168.43.219:8080
+
 
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
