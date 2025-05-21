@@ -1,12 +1,12 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.hospitalfrontend.ui.care
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
-import com.hospitalfrontend.ui.profile.InputField
 import com.hospitalfrontend.ui.profile.MedicalDrawerItem
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import com.hospitalfrontend.viewmodel.CareDetailViewModel
@@ -42,21 +40,18 @@ fun CareDetailScreen(
     navController: NavController,
 ) {
     val viewModel: CareDetailViewModel = viewModel()
-    LaunchedEffect(careId) {
-        viewModel.getCareById(careId)
-    }
-
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'Usuari"
-    var isEditing by remember { mutableStateOf(false) }
-    var drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    var showTensionFields by remember { mutableStateOf(false) }
-    var showDrenajesFields by remember { mutableStateOf(false) }
-    var showHigieneFields by remember { mutableStateOf(false) }
-    var showDietaFields by remember { mutableStateOf(false) }
-    var showMobilizacionesFields by remember { mutableStateOf(false) }
+    // Estats per seccions col·lapsables
+    var showVitalSigns by remember { mutableStateOf(true) }
+    var showDrainages by remember { mutableStateOf(false) }
+    var showHigiene by remember { mutableStateOf(false) }
+    var showDieta by remember { mutableStateOf(false) }
+    var showMobilizations by remember { mutableStateOf(false) }
 
+    // Estats per camps (només lectura)
     var tensionSistolica by remember { mutableStateOf(TextFieldValue("")) }
     var tensionDiastolica by remember { mutableStateOf(TextFieldValue("")) }
     var frecuenciaRespiratoria by remember { mutableStateOf(TextFieldValue("")) }
@@ -65,25 +60,21 @@ fun CareDetailScreen(
     var saturacionOxigeno by remember { mutableStateOf(TextFieldValue("")) }
     var drenajeTipo by remember { mutableStateOf(TextFieldValue("")) }
     var drenajeDebito by remember { mutableStateOf(TextFieldValue("")) }
-
-    var higieneAllitat by remember { mutableStateOf(false) }
-    var higieneParcialLlit by remember { mutableStateOf(false) }
-    var higieneDutxaAjuda by remember { mutableStateOf(false) }
-    var higieneAutonom by remember { mutableStateOf(false) }
-
-    var selectedTexture by remember { mutableStateOf("Seleccionar") }
-    var selectedDieta by remember { mutableStateOf("Seleccionar") }
-    var autonomia by remember { mutableStateOf("Seleccionar") }
-    var portadorProtesi by remember { mutableStateOf(false) }
-
     var observaciones by remember { mutableStateOf(TextFieldValue("")) }
     var sedestacion by remember { mutableStateOf(TextFieldValue("")) }
-    var selectedDeambulacion by remember { mutableStateOf(TextFieldValue("")) }
+    var selectedDeambulacion by remember { mutableStateOf("") }
+    var selectedDeambulacionType by remember { mutableStateOf("") }
     var cambiosPosturales by remember { mutableStateOf(TextFieldValue("")) }
+    var tipusHigiene by remember { mutableStateOf("") }
+    var selectedTextura by remember { mutableStateOf("") }
+    var selectedTipusDieta by remember { mutableStateOf(setOf<String>()) }
+    var autonomiaAlimentaria by remember { mutableStateOf("") }
+    var portadorProtesis by remember { mutableStateOf("") }
 
+    // Carregar dades inicials
     val care by viewModel.care.collectAsState()
-
     LaunchedEffect(care) {
+        viewModel.getCareById(careId)
         care?.let {
             tensionSistolica = TextFieldValue(it.systolicBp?.toString() ?: "")
             tensionDiastolica = TextFieldValue(it.diastolicBp?.toString() ?: "")
@@ -96,7 +87,15 @@ fun CareDetailScreen(
             observaciones = TextFieldValue(it.note.orEmpty())
             sedestacion = TextFieldValue(it.sedation.orEmpty())
             cambiosPosturales = TextFieldValue(it.posturalChanges.orEmpty())
-            selectedDeambulacion = TextFieldValue(it.ambulation.orEmpty())
+            selectedDeambulacion = it.ambulation?.substringBefore(" (") ?: ""
+            selectedDeambulacionType = if (it.ambulation?.contains("(") == true) {
+                it.ambulation.substringAfter("(").substringBefore(")")
+            } else ""
+            tipusHigiene = it.hygieneType.orEmpty() // Corregit de hygineType a hygieneType
+            selectedTextura = it.dietTexture.orEmpty()
+            selectedTipusDieta = it.dietType?.split(",")?.map { it.trim() }?.toSet() ?: setOf()
+            autonomiaAlimentaria = it.dietAutonomy.orEmpty()
+            portadorProtesis = it.prosthesis?.toString() ?: ""
         }
     }
 
@@ -189,23 +188,16 @@ fun CareDetailScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFE0F7FA).copy(alpha = 0.3f)), // Fons subtil cian clar
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "DETALL DE CURES",
-                                fontSize = 24.sp, // Mida una mica més gran
-                                fontWeight = FontWeight.SemiBold, // Pes més elegant
-                                color = Color(0xFF00695C), // Mateix color que les icones per harmonia
-                                fontStyle = FontStyle.Italic, // Toc elegant amb cursiva
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        Text(
+                            text = "DETALL DE CURES",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF00695C),
+                            fontStyle = FontStyle.Italic,
+                            textAlign = TextAlign.Center
+                        )
                     },
                     navigationIcon = {
                         Row(
@@ -229,73 +221,283 @@ fun CareDetailScreen(
                                 )
                             }
                         }
-                    },
-
-                            actions = {
-                        TextButton(onClick = { isEditing = !isEditing }) {
-                            Text(
-                                text = if (isEditing) "Cancelar" else "Editar",
-                                color = Color.Black,
-                                fontSize = 18.sp
-                            )
-                        }
                     }
                 )
             }
-        ) { paddingValues ->
-            Column(
+        ) { padding ->
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.vaccine_11934404),
-                    contentDescription = "Foto de perfil",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clickable { }
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text("Constants Vitals", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
-
-                Text("Pressió Arterial", fontSize = 18.sp, modifier = Modifier.clickable { showTensionFields = !showTensionFields })
-                if (showTensionFields) {
-                    InputField(tensionSistolica, { tensionSistolica = it }, "Tensió Sistòlica", isEditing)
-                    InputField(tensionDiastolica, { tensionDiastolica = it }, "Tensió Diastòlica", isEditing)
-                }
-
-                InputField(frecuenciaRespiratoria, { frecuenciaRespiratoria = it }, "Freqüència Respiratòria", isEditing)
-                InputField(pulso, { pulso = it }, "Pols", isEditing)
-                InputField(temperatura, { temperatura = it }, "Temperatura", isEditing)
-                InputField(saturacionOxigeno, { saturacionOxigeno = it }, "Saturació d'Oxigen", isEditing)
-
-                Text("Drenatges", fontSize = 18.sp, modifier = Modifier.clickable { showDrenajesFields = !showDrenajesFields })
-                if (showDrenajesFields) {
-                    InputField(drenajeTipo, { drenajeTipo = it }, "Tipus de Drenatge", isEditing)
-                    InputField(drenajeDebito, { drenajeDebito = it }, "Dèbit", isEditing)
-                }
-
-                Text("Mobilitzacions", fontSize = 18.sp, modifier = Modifier.clickable { showMobilizacionesFields = !showMobilizacionesFields })
-                if (showMobilizacionesFields) {
-                    InputField(sedestacion, { sedestacion = it }, "Sedestació", isEditing)
-                    InputField(selectedDeambulacion, { selectedDeambulacion = it }, "Tipus de deambulació", isEditing)
-                    InputField(cambiosPosturales, { cambiosPosturales = it }, "Canvis posturals", isEditing)
-                }
-
-                InputField(observaciones, { observaciones = it }, "Observacions", isEditing)
-
-                if (isEditing) {
+                item {
+                    Image(
+                        painter = painterResource(id = R.drawable.informe_medico),
+                        contentDescription = "Icono de cuidados",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(top = 16.dp)
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { isEditing = false },
-                        modifier = Modifier.fillMaxWidth()
+                }
+
+                // Secció Constants Vitals
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Text("Guardar")
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showVitalSigns = !showVitalSigns }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Constants Vitals",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showVitalSigns) R.drawable.arrow_up else R.drawable.arrow_down
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            if (showVitalSigns) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    ReadOnlyTextField(tensionSistolica, "Pressió Sistòlica")
+                                    ReadOnlyTextField(tensionDiastolica, "Pressió Diastòlica")
+                                    ReadOnlyTextField(frecuenciaRespiratoria, "Freqüència Respiratòria")
+                                    ReadOnlyTextField(pulso, "Pols")
+                                    ReadOnlyTextField(temperatura, "Temperatura")
+                                    ReadOnlyTextField(saturacionOxigeno, "Saturació d'Oxigen")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Secció Drenatges
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showDrainages = !showDrainages }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Drenatges",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showDrainages) R.drawable.arrow_up else R.drawable.arrow_down
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            if (showDrainages) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    ReadOnlyTextField(drenajeTipo, "Tipus de drenatge")
+                                    ReadOnlyTextField(drenajeDebito, "Débit")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Secció Higiene
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showHigiene = !showHigiene }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Higiene",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showHigiene) R.drawable.arrow_up else R.drawable.arrow_down
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            if (showHigiene) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    ReadOnlyDropdownField(tipusHigiene, "Tipus d'Higiene")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Secció Dieta
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showDieta = !showDieta }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Dieta",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showDieta) R.drawable.arrow_up else R.drawable.arrow_down
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            if (showDieta) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    Text(
+                                        "Textures",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    ReadOnlyDropdownField(selectedTextura, "Textura")
+                                    Text(
+                                        "Tipus de dieta",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    ReadOnlyDropdownField(selectedTipusDieta.joinToString(", "), "Tipus de dieta")
+                                    Text(
+                                        "Autonomia alimentària",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    ReadOnlyDropdownField(autonomiaAlimentaria, "Autonomia alimentària")
+                                    Text(
+                                        "Portador de pròtesis",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    ReadOnlyDropdownField(portadorProtesis, "Portador de pròtesis")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Secció Movilitzacions
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showMobilizations = !showMobilizations }
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Movilitzacions",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (showMobilizations) R.drawable.arrow_up else R.drawable.arrow_down
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            if (showMobilizations) {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    ReadOnlyTextField(sedestacion, "Sedestació")
+                                    Text(
+                                        "Deambulació",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                    ReadOnlyDropdownField(selectedDeambulacion, "Deambulació")
+                                    if (selectedDeambulacion == "Sí") {
+                                        ReadOnlyDropdownField(selectedDeambulacionType, "Tipus de deambulació")
+                                    }
+                                    ReadOnlyTextField(cambiosPosturales, "Canvis Posturals")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Observacions
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            ReadOnlyTextField(
+                                value = observaciones,
+                                label = "Observacions",
+                                singleLine = false,
+                                modifier = Modifier.height(100.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -303,47 +505,53 @@ fun CareDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuBox(
-    selectedOption: String,
-    options: List<String>,
+fun ReadOnlyTextField(
+    value: TextFieldValue,
     label: String,
-    onOptionSelected: (String) -> Unit
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = true
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(selectedOption) }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            OutlinedTextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(label) },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {}, // No permet canvis
+            label = { Text(label) },
+            readOnly = true,
+            singleLine = singleLine,
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.Gray
             )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            selectedText = option
-                            onOptionSelected(option)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
+        )
+    }
+}
+
+@Composable
+fun ReadOnlyDropdownField(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {}, // No permet canvis
+            label = { Text(label) },
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_down),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.Gray
+            )
+        )
     }
 }
