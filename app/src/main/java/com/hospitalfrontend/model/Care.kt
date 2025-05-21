@@ -6,6 +6,9 @@ data class Care(
     @SerializedName("id_care")
     val idCare: Int,
 
+    val nurse: Nurse,
+    val patient: Patient,
+
     @SerializedName("systolic_bp")
     val systolicBp: Int,
 
@@ -24,29 +27,39 @@ data class Care(
     val oxygenSaturation: Double,
 
     @SerializedName("drainage_type")
-    val drainageType: String,
+    val drainageType: String?,
 
     @SerializedName("drainage_debit")
-    val drainageDebit: Int,
+    val drainageDebit: Int?,
 
-    @SerializedName("hygine_type") // usa esto si el JSON tiene el typo
-    val hygieneType: String,
+    @SerializedName("hygine_type")
+    val hygieneType: String?,
 
-    val sedation: String,
-    val ambulation: String,
+    val sedation: String?,
+    val ambulation: String?,
 
     @SerializedName("postural_changes")
-    val posturalChanges: String,
+    val posturalChanges: String?,
 
     @SerializedName("recorded_at")
-    val recordedAt: String, // o Date con adaptador
+    val recordedAt: String,
 
-    val note: String,
+    val note: String?,
 
-    val nurse: Nurse,
-    val patient: Patient,
-    val room: Room
+    // Nuevos campos añadidos en el back:
+    @SerializedName("diet_texture")
+    val dietTexture: String?,
+
+    @SerializedName("diet_type")
+    val dietType: String?,
+
+    @SerializedName("diet_autonomy")
+    val dietAutonomy: String?,
+
+    val prosthesis: Boolean?,
+    val room: Room? = null
 )
+
 
 data class CareResponse(
     val data: List<Care>
