@@ -192,10 +192,10 @@ fun NurseProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.imagen_login_hospital), // Main profile image
+                    painter = painterResource(id = R.drawable.enfermera_login), // Main profile image
                     contentDescription = "Imatge de Perfil",
                     modifier = Modifier
-                        .size(150.dp)
+                        .size(160.dp)
                         .padding(bottom = 24.dp)
                         .clip(shape = CircleShape)
                         .background(MaterialTheme.colorScheme.secondaryContainer),

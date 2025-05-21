@@ -291,30 +291,30 @@ fun AddCaresScreen(
                         // Validacions de rangs bàsics
                         systolicError =
                             if (tensionSistolica.text.isNotEmpty() && tensionSistolica.text.toIntOrNull() !in 50..250) {
-                                "Rang no vàlid (50-250)"
+                                "Rang no vàlid (90-140)"
                             } else null
                         diastolicError =
                             if (tensionDiastolica.text.isNotEmpty() && tensionDiastolica.text.toIntOrNull() !in 30..150) {
-                                "Rang no vàlid (30-150)"
+                                "Rang no vàlid (50-90)"
                             } else null
                         tempError = if (temperatura.text.isNotEmpty()) {
                             val tempValue = temperatura.text.toDoubleOrNull()
                             if (tempValue != null && tempValue !in 34.0..42.0) {
-                                "Rang no vàlid (34-42)"
+                                "Rang no vàlid (12-20)"
                             } else null
                         } else null
                         respiratoryError =
                             if (frecuenciaRespiratoria.text.isNotEmpty() && frecuenciaRespiratoria.text.toIntOrNull() !in 0..100) {
-                                "Rang no vàlid (0-100)"
+                                "Rang no vàlid (50-100)"
                             } else null
                         pulseError =
                             if (pulso.text.isNotEmpty() && pulso.text.toIntOrNull() !in 0..200) {
-                                "Rang no vàlid (0-200)"
+                                "Rang no vàlid (34.9-38.5)"
                             } else null
                         oxygenError = if (saturacionOxigeno.text.isNotEmpty()) {
                             val oxygenValue = saturacionOxigeno.text.toDoubleOrNull()
                             if (oxygenValue != null && oxygenValue !in 0.0..100.0) {
-                                "Rang no vàlid (0-100)"
+                                "Rang no vàlid (≥94)"
                             } else null
                         } else null
 
