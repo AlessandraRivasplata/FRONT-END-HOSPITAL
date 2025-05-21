@@ -57,71 +57,81 @@ fun MedicalDataScreen(
     }
 
     ModalNavigationDrawer(
-        drawerState = drawerState,
+        drawerState = drawerState, //
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color(0xFFE0F2F1)
+                drawerContainerColor = Color(0xFFE0F2F1) //
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally, //
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
+                        .fillMaxSize() //
+                        .padding(16.dp) //
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.medico_menu),
-                        contentDescription = "Imatge del menú",
+                        painter = painterResource(id = R.drawable.medico_menu), //
+                        contentDescription = "Imatge del menú", //
                         modifier = Modifier
-                            .size(120.dp)
-                            .padding(top = 8.dp)
+                            .size(120.dp) //
+                            .padding(top = 8.dp) //
+                            .clickable {
+                                scope.launch { drawerState.close() }
+                                navController.navigate("nurse_profile")
+                            }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp)) //
                     Text(
-                        text = nurseName,
+                        text = nurseName, //
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontWeight = FontWeight.Bold, //
+                            fontSize = 20.sp //
                         ),
-                        color = Color(0xFF004D40)
+                        color = Color(0xFF004D40) //
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    Spacer(modifier = Modifier.height(16.dp)) //
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp) //
+                    Spacer(modifier = Modifier.height(8.dp)) //
+                    MedicalDrawerItem("Dades Personals") { //
+                        scope.launch { drawerState.close() }
                         navController.navigate("personal_data/$patientId")
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem("Dades Mèdiques") { //
+                        scope.launch { drawerState.close() }
                         navController.navigate("medical_data/$patientId")
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem("Registre de cures") { //
+                        scope.launch { drawerState.close() }
                         navController.navigate("care_data/$patientId")
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.weight(1f)) //
+                    Divider(color = Color(0xFFB2DFDB), thickness = 1.dp) //
+                    Spacer(modifier = Modifier.height(8.dp)) //
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically, //
                         modifier = Modifier
-                            .clickable { navController.navigate("list_rooms") }
-                            .padding(12.dp)
+                            .clickable {
+                                scope.launch { drawerState.close() }
+                                navController.navigate("list_rooms")
+                            } //
+                            .padding(12.dp) //
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.log_out_icono),
-                            contentDescription = "Sortir",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
+                            painter = painterResource(id = R.drawable.log_out_icono), //
+                            contentDescription = "Sortir", //
+                            modifier = Modifier.size(24.dp), //
+                            tint = Color.Unspecified //
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp)) //
                         Text(
-                            text = "Sortir",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                            color = Color(0xFF004D40)
+                            text = "Sortir", //
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), //
+                            color = Color(0xFF004D40) //
                         )
                     }
                 }
             }
         }
-    ) {
+    )  {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(

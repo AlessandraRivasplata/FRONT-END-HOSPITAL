@@ -29,7 +29,7 @@ class NurseRegisterViewModel : ViewModel() {
             _createNurseUiState.value = CreateNurseUiState.Loading
             try {
                 val connection = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8081/")//Sergi: http://10.0.22.114:8080
+                    .baseUrl("http://10.0.2.2:8080/")//Sergi: http://10.0.22.114:8080
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
