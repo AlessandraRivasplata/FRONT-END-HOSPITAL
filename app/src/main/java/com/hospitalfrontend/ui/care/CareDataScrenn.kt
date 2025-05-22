@@ -30,6 +30,8 @@ import com.hospitalfrontend.R
 import com.hospitalfrontend.ui.care.CaresDataViewModel
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import kotlinx.coroutines.launch
+import com.hospitalfrontend.ui.sharedViewModel.DrawerNavigationViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +39,8 @@ fun CareDataScreen(
     navController: NavController,
     patientId: String?,
     viewModel: CaresDataViewModel = viewModel(),
-    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
+    drawerNavigationViewModel: DrawerNavigationViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -46,17 +49,18 @@ fun CareDataScreen(
     val cares = caresViewModel.cares.collectAsState().value
 
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nombre de Usuario"
+    val currentDrawerRoute by drawerNavigationViewModel.currentDrawerRoute.collectAsState()
 
-    // Llamada a la API al entrar en la pantalla
     LaunchedEffect(patientId) {
         patientId?.toIntOrNull()?.let { id ->
             caresViewModel.getCaresByPatientId(id)
         }
+        drawerNavigationViewModel.setCurrentDrawerRoute("care_data/$patientId")
     }
 
     LaunchedEffect(cares) {
         if (cares.isNotEmpty()) {
-            Log.d("CareDataScreen", "Cares cargados: $cares")
+            Log.d("CareDataScreen", "Cares cargados: ${cares.size}")
         }
     }
 
@@ -106,17 +110,32 @@ fun CareDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    MedicalDrawerItem(
+                        text = "Dades Personals",
+                        route = "personal_data/$patientId",
+                        isSelected = currentDrawerRoute == "personal_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("personal_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem(
+                        text = "Dades Mèdiques",
+                        route = "medical_data/$patientId",
+                        isSelected = currentDrawerRoute == "medical_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("medical_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem(
+                        text = "Registre de cures",
+                        route = "care_data/$patientId",
+                        isSelected = currentDrawerRoute == "care_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("care_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
@@ -154,7 +173,7 @@ fun CareDataScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color(0xFFE0F7FA).copy(alpha = 0.3f)), // Fons subtil cian clar
+                                .background(Color(0xFFE0F7FA).copy(alpha = 0.3f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -191,21 +210,20 @@ fun CareDataScreen(
                         }
                     },
 
-                            actions = {
-                        // Reemplazo IconButton por Button verde estilo "DETALL"
+                    actions = {
                         Button(
                             onClick = { navController.navigate("add_care/$patientId") },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF00695C), // Verde igual al botón DETALL
-                                contentColor = Color.White // Texto blanco
+                                containerColor = Color(0xFF00695C),
+                                contentColor = Color.White
                             ),
                             modifier = Modifier
                                 .padding(end = 8.dp)
-                                .height(36.dp) // Tamaño ajustado para TopAppBar
+                                .height(36.dp)
                         ) {
                             Text(
                                 text = "Crear",
-                                fontSize = 14.sp // Tamaño de texto ajustado
+                                fontSize = 14.sp
                             )
                         }
                     }
@@ -220,7 +238,6 @@ fun CareDataScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Resto del código sin cambios
                 Image(
                     painter = painterResource(id = R.drawable.historial_icono),
                     contentDescription = "Imagen de cabecera",
@@ -244,7 +261,7 @@ fun CareDataScreen(
                 }
             }
         }
-}
+    }
 }
 
 

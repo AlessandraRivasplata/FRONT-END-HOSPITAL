@@ -24,14 +24,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hospitalfrontend.R
-import com.hospitalfrontend.model.Patient
 import com.hospitalfrontend.ui.profile.PatientDataViewModel
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
+import com.hospitalfrontend.ui.sharedViewModel.DrawerNavigationViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +39,8 @@ fun PersonalDataScreen(
     navController: NavController,
     patientId: String?,
     viewModel: PatientDataViewModel = viewModel(),
-    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
+    drawerNavigationViewModel: DrawerNavigationViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -48,11 +48,13 @@ fun PersonalDataScreen(
     val patient by viewModel.patient.collectAsState()
 
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'usuari"
+    val currentDrawerRoute by drawerNavigationViewModel.currentDrawerRoute.collectAsState()
 
     LaunchedEffect(patientId) {
         patientId?.toIntOrNull()?.let { id ->
             viewModel.getPatientById(id)
         }
+        drawerNavigationViewModel.setCurrentDrawerRoute("personal_data/$patientId")
     }
 
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
@@ -123,17 +125,32 @@ fun PersonalDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    MedicalDrawerItem(
+                        text = "Dades Personals",
+                        route = "personal_data/$patientId",
+                        isSelected = currentDrawerRoute == "personal_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        navController.navigate("personal_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem(
+                        text = "Dades Mèdiques",
+                        route = "medical_data/$patientId",
+                        isSelected = currentDrawerRoute == "medical_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        navController.navigate("medical_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem(
+                        text = "Registre de cures",
+                        route = "care_data/$patientId",
+                        isSelected = currentDrawerRoute == "care_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        navController.navigate("care_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)

@@ -30,6 +30,8 @@ import com.hospitalfrontend.ui.profile.MedicalDrawerItem
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import com.hospitalfrontend.viewmodel.CareDetailViewModel
 import kotlinx.coroutines.launch
+import com.hospitalfrontend.ui.sharedViewModel.DrawerNavigationViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,20 +40,20 @@ fun CareDetailScreen(
     patientId: String?,
     nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
     navController: NavController,
+    drawerNavigationViewModel: DrawerNavigationViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val viewModel: CareDetailViewModel = viewModel()
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'Usuari"
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val currentDrawerRoute by drawerNavigationViewModel.currentDrawerRoute.collectAsState()
 
-    // Estats per seccions col·lapsables
     var showVitalSigns by remember { mutableStateOf(true) }
     var showDrainages by remember { mutableStateOf(false) }
     var showHigiene by remember { mutableStateOf(false) }
     var showDieta by remember { mutableStateOf(false) }
     var showMobilizations by remember { mutableStateOf(false) }
 
-    // Estats per camps (només lectura)
     var tensionSistolica by remember { mutableStateOf(TextFieldValue("")) }
     var tensionDiastolica by remember { mutableStateOf(TextFieldValue("")) }
     var frecuenciaRespiratoria by remember { mutableStateOf(TextFieldValue("")) }
@@ -71,10 +73,11 @@ fun CareDetailScreen(
     var autonomiaAlimentaria by remember { mutableStateOf("") }
     var portadorProtesis by remember { mutableStateOf("") }
 
-    // Carregar dades inicials
     val care by viewModel.care.collectAsState()
-    LaunchedEffect(care) {
+    LaunchedEffect(careId) {
         viewModel.getCareById(careId)
+    }
+    LaunchedEffect(care) {
         care?.let {
             tensionSistolica = TextFieldValue(it.systolicBp?.toString() ?: "")
             tensionDiastolica = TextFieldValue(it.diastolicBp?.toString() ?: "")
@@ -91,7 +94,7 @@ fun CareDetailScreen(
             selectedDeambulacionType = if (it.ambulation?.contains("(") == true) {
                 it.ambulation.substringAfter("(").substringBefore(")")
             } else ""
-            tipusHigiene = it.hygieneType.orEmpty() // Corregit de hygineType a hygieneType
+            tipusHigiene = it.hygieneType.orEmpty()
             selectedTextura = it.dietTexture.orEmpty()
             selectedTipusDieta = it.dietType?.split(",")?.map { it.trim() }?.toSet() ?: setOf()
             autonomiaAlimentaria = it.dietAutonomy.orEmpty()
@@ -145,17 +148,32 @@ fun CareDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    MedicalDrawerItem(
+                        text = "Dades Personals",
+                        route = "personal_data/$patientId",
+                        isSelected = currentDrawerRoute == "personal_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("personal_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem(
+                        text = "Dades Mèdiques",
+                        route = "medical_data/$patientId",
+                        isSelected = currentDrawerRoute == "medical_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("medical_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem(
+                        text = "Registre de cures",
+                        route = "care_data/$patientId",
+                        isSelected = currentDrawerRoute == "care_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("care_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
@@ -243,7 +261,6 @@ fun CareDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Secció Constants Vitals
                 item {
                     Card(
                         modifier = Modifier
@@ -287,7 +304,6 @@ fun CareDetailScreen(
                     }
                 }
 
-                // Secció Drenatges
                 item {
                     Card(
                         modifier = Modifier
@@ -327,7 +343,6 @@ fun CareDetailScreen(
                     }
                 }
 
-                // Secció Higiene
                 item {
                     Card(
                         modifier = Modifier
@@ -366,7 +381,6 @@ fun CareDetailScreen(
                     }
                 }
 
-                // Secció Dieta
                 item {
                     Card(
                         modifier = Modifier
@@ -432,7 +446,6 @@ fun CareDetailScreen(
                     }
                 }
 
-                // Secció Movilitzacions
                 item {
                     Card(
                         modifier = Modifier
@@ -482,7 +495,6 @@ fun CareDetailScreen(
                     }
                 }
 
-                // Observacions
                 item {
                     Card(
                         modifier = Modifier
@@ -515,7 +527,7 @@ fun ReadOnlyTextField(
     Column(modifier = modifier.padding(vertical = 4.dp)) {
         OutlinedTextField(
             value = value,
-            onValueChange = {}, // No permet canvis
+            onValueChange = {},
             label = { Text(label) },
             readOnly = true,
             singleLine = singleLine,
@@ -537,7 +549,7 @@ fun ReadOnlyDropdownField(
     Column(modifier = modifier.padding(vertical = 4.dp)) {
         OutlinedTextField(
             value = value,
-            onValueChange = {}, // No permet canvis
+            onValueChange = {},
             label = { Text(label) },
             readOnly = true,
             trailingIcon = {
