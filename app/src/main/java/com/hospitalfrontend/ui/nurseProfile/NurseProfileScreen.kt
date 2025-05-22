@@ -163,14 +163,6 @@ fun NurseProfileScreen(
                                     tint = Color(0xFF00695C)
                                 )
                             }
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menú desplegable",
-                                    modifier = Modifier.size(25.dp),
-                                    tint = Color(0xFF00695C)
-                                )
-                            }
                         }
                     },
                     actions = {
