@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
 import android.media.MediaPlayer
-import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
@@ -34,13 +33,14 @@ import com.hospitalfrontend.model.CreateCare
 import com.hospitalfrontend.model.NurseId
 import com.hospitalfrontend.model.PatientId
 import com.hospitalfrontend.ui.care.CreateCareViewModel
-import com.hospitalfrontend.ui.profile.DrawerItem
 import com.hospitalfrontend.ui.profile.InputField
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 import com.hospitalfrontend.ui.profile.MedicalDrawerItem
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.hospitalfrontend.ui.sharedViewModel.DrawerNavigationViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,22 +48,22 @@ fun AddCaresScreen(
     navController: NavController,
     patientId: String?,
     nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
-    createCareViewModel: CreateCareViewModel = viewModel()
+    createCareViewModel: CreateCareViewModel = viewModel(),
+    drawerNavigationViewModel: DrawerNavigationViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom  d'Usuari"
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val currentDrawerRoute by drawerNavigationViewModel.currentDrawerRoute.collectAsState()
 
-    // Estados para secciones colapsables
     var showVitalSigns by remember { mutableStateOf(true) }
     var showDrainages by remember { mutableStateOf(false) }
     var showHigiene by remember { mutableStateOf(false) }
     var showDieta by remember { mutableStateOf(false) }
     var showMobilizations by remember { mutableStateOf(false) }
 
-    // Estados para campos con validación
     var tensionSistolica by remember { mutableStateOf(TextFieldValue("")) }
     var tensionDiastolica by remember { mutableStateOf(TextFieldValue("")) }
     var frecuenciaRespiratoria by remember { mutableStateOf(TextFieldValue("")) }
@@ -83,7 +83,6 @@ fun AddCaresScreen(
     var autonomiaAlimentaria by remember { mutableStateOf("") }
     var portadorProtesis by remember { mutableStateOf("") }
 
-    // Estados para errores de validación
     var systolicError by remember { mutableStateOf<String?>(null) }
     var diastolicError by remember { mutableStateOf<String?>(null) }
     var tempError by remember { mutableStateOf<String?>(null) }
@@ -91,12 +90,10 @@ fun AddCaresScreen(
     var pulseError by remember { mutableStateOf<String?>(null) }
     var oxygenError by remember { mutableStateOf<String?>(null) }
 
-    // Estado para la alerta
     val mediaPlayerState = remember { mutableStateOf<MediaPlayer?>(null) }
     var showAlert by remember { mutableStateOf(false) }
     var alertMessage by remember { mutableStateOf("") }
 
-    // Opciones para desplegables
     val higieneOptions = listOf("Aïllat", "Parcial al llit", "Dutxa amb ajuda", "Dutxa sense ajuda", "Autònom")
     val texturaOptions = listOf("Absoluta", "Hídrica (quantitat diària)", "Líquida", "Túrmix", "Semitova", "Tova", "Fàcil masticació", "Basal")
     val tipusDietaOptions = listOf(
@@ -109,10 +106,8 @@ fun AddCaresScreen(
     val deambulacionOptions = listOf("Sí", "No")
     val deambulacionTypeOptions = listOf("Amb bastó", "Amb caminador", "Amb ajuda física")
 
-    // Función para reproducir sonido de alarma
     fun playAlarmSound(mediaPlayerState: MutableState<MediaPlayer?>) {
         Log.d("AlarmSound", "Intentant reproduir el so sonida_alerta.mp3")
-        // Atura i allibera qualsevol MediaPlayer existent per evitar fuites
         mediaPlayerState.value?.stop()
         mediaPlayerState.value?.release()
         mediaPlayerState.value = null
@@ -123,22 +118,20 @@ fun AddCaresScreen(
             return
         }
         try {
-            mediaPlayer.setVolume(1.0f, 1.0f) // Volum al màxim
-            mediaPlayer.isLooping = true // Activa el bucle
+            mediaPlayer.setVolume(1.0f, 1.0f)
+            mediaPlayer.isLooping = true
             mediaPlayer.start()
             Log.d("AlarmSound", "So iniciat en bucle")
-            mediaPlayerState.value = mediaPlayer // Guarda la referència
+            mediaPlayerState.value = mediaPlayer
         } catch (e: Exception) {
             Log.e("AlarmSound", "Error en iniciar el so: ${e.message}")
             mediaPlayer.release()
         }
     }
 
-    // Diálogo de alerta
     if (showAlert) {
         AlertDialog(
             onDismissRequest = {
-                // Atura el so quan es tanqui el diàleg
                 mediaPlayerState.value?.stop()
                 mediaPlayerState.value?.release()
                 mediaPlayerState.value = null
@@ -148,7 +141,6 @@ fun AddCaresScreen(
             text = { Text(alertMessage) },
             confirmButton = {
                 TextButton(onClick = {
-                    // Atura el so quan es premi "D'acord"
                     mediaPlayerState.value?.stop()
                     mediaPlayerState.value?.release()
                     mediaPlayerState.value = null
@@ -206,17 +198,32 @@ fun AddCaresScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    MedicalDrawerItem(
+                        text = "Dades Personals",
+                        route = "personal_data/$patientId",
+                        isSelected = currentDrawerRoute == "personal_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("personal_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem(
+                        text = "Dades Mèdiques",
+                        route = "medical_data/$patientId",
+                        isSelected = currentDrawerRoute == "medical_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("medical_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem(
+                        text = "Registre de cures",
+                        route = "care_data/$patientId",
+                        isSelected = currentDrawerRoute == "care_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("care_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
@@ -288,7 +295,6 @@ fun AddCaresScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        // Validacions de rangs bàsics
                         systolicError =
                             if (tensionSistolica.text.isNotEmpty() && tensionSistolica.text.toIntOrNull() !in 50..250) {
                                 "Rang no vàlid (90-140)"
@@ -318,7 +324,6 @@ fun AddCaresScreen(
                             } else null
                         } else null
 
-                        // Validacions d'alarmes
                         val alerts = mutableListOf<String>()
                         tensionSistolica.text.toIntOrNull()?.let {
                             if (it > 140 || it < 90) {
@@ -354,10 +359,9 @@ fun AddCaresScreen(
                         if (alerts.isNotEmpty()) {
                             alertMessage = alerts.joinToString("\n")
                             showAlert = true
-                            playAlarmSound(mediaPlayerState) // Passa la variable mediaPlayerState
+                            playAlarmSound(mediaPlayerState)
                         }
 
-                        // Continuar amb el desat si no hi ha errors de validació
                         if (systolicError == null && diastolicError == null && tempError == null &&
                             respiratoryError == null && pulseError == null && oxygenError == null
                         ) {
@@ -424,7 +428,6 @@ fun AddCaresScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Sección Constantes Vitales
                 item {
                     Card(
                         modifier = Modifier
@@ -455,17 +458,17 @@ fun AddCaresScreen(
                                 )
                             }
                             if (showVitalSigns) {
-                                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                                        InputField(
-                                            value = tensionSistolica,
-                                            onValueChange = { if (it.text.all { char -> char.isDigit() }) {
-                                                tensionSistolica = it
-                                            } },
-                                            label = "Pressió Sistòlica",
-                                            placeholder = "90-140",
-                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                            error = systolicError
-                                        )
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    InputField(
+                                        value = tensionSistolica,
+                                        onValueChange = { if (it.text.all { char -> char.isDigit() }) {
+                                            tensionSistolica = it
+                                        } },
+                                        label = "Pressió Sistòlica",
+                                        placeholder = "90-140",
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        error = systolicError
+                                    )
                                     InputField(
                                         value = tensionDiastolica,
                                         onValueChange = { if (it.text.all { char -> char.isDigit() }) {
@@ -518,7 +521,6 @@ fun AddCaresScreen(
                     }
                 }
 
-                // Sección Drenajes
                 item {
                     Card(
                         modifier = Modifier
@@ -571,7 +573,6 @@ fun AddCaresScreen(
                     }
                 }
 
-                // Sección Higiene
                 item {
                     Card(
                         modifier = Modifier
@@ -641,7 +642,6 @@ fun AddCaresScreen(
                     }
                 }
 
-                // Sección Dieta
                 item {
                     Card(
                         modifier = Modifier
@@ -834,7 +834,6 @@ fun AddCaresScreen(
                     }
                 }
 
-                // Sección Movilizaciones
                 item {
                     Card(
                         modifier = Modifier
@@ -957,7 +956,6 @@ fun AddCaresScreen(
                     }
                 }
 
-                // Observaciones
                 item {
                     Card(
                         modifier = Modifier

@@ -27,33 +27,53 @@ import androidx.navigation.NavController
 import com.hospitalfrontend.R
 import com.hospitalfrontend.model.DiagnosisResponse
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
+import com.hospitalfrontend.ui.sharedViewModel.DrawerNavigationViewModel
 
+@Composable
+fun MedicalDrawerItem(
+    text: String,
+    route: String,
+    isSelected: Boolean,
+    onClick: (String) -> Unit
+) {
+    Text(
+        text = text,
+        fontSize = 18.sp,
+        style = MaterialTheme.typography.bodyLarge.copy(
+            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
+            color = if (isSelected) Color(0xFF004D40) else Color.Black
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(route) }
+            .padding(16.dp)
+            .background(if (isSelected) Color(0xFFB2DFDB).copy(alpha = 0.5f) else Color.Transparent)
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicalDataScreen(
     navController: NavController,
     patientId: String?,
-    medicalDataViewModel: MedicalDataViewModel = viewModel(), // Obtener la instancia del ViewModel
-    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
+    medicalDataViewModel: MedicalDataViewModel = viewModel(),
+    nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity),
+    drawerNavigationViewModel: DrawerNavigationViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    //val diagnosisState: MedicalDataUiState by medicalDataViewModel.medicalDataUiState.collectAsState()
-    //val diagnosisData: DiagnosisResponse? by medicalDataViewModel.diagnosis.collectAsState()
 
-    // Obtenemos el estado y los datos del ViewModel
     val diagnosisState by medicalDataViewModel.medicalDataUiState.collectAsState()
     val diagnosisData by medicalDataViewModel.diagnosis.collectAsState()
     val nurseName = nurseSharedViewModel.nurse?.name ?: "Nom d'Usuari"
+    val currentDrawerRoute by drawerNavigationViewModel.currentDrawerRoute.collectAsState()
 
-    // Hacer la consulta cuando se llega a la pantalla
     LaunchedEffect(patientId) {
         patientId?.toIntOrNull()?.let { id ->
             medicalDataViewModel.getDiagnosisByPatientId(id)
         }
+        drawerNavigationViewModel.setCurrentDrawerRoute("medical_data/$patientId")
     }
 
     ModalNavigationDrawer(
@@ -102,17 +122,32 @@ fun MedicalDataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
-                    MedicalDrawerItem("Dades Personals") {
+                    MedicalDrawerItem(
+                        text = "Dades Personals",
+                        route = "personal_data/$patientId",
+                        isSelected = currentDrawerRoute == "personal_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("personal_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Dades Mèdiques") {
+                    MedicalDrawerItem(
+                        text = "Dades Mèdiques",
+                        route = "medical_data/$patientId",
+                        isSelected = currentDrawerRoute == "medical_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("medical_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
-                    MedicalDrawerItem("Registre de cures") {
+                    MedicalDrawerItem(
+                        text = "Registre de cures",
+                        route = "care_data/$patientId",
+                        isSelected = currentDrawerRoute == "care_data/$patientId"
+                    ) { route ->
                         scope.launch { drawerState.close() }
-                        // navController.navigate("care_data/$patientId")
+                        drawerNavigationViewModel.setCurrentDrawerRoute(route)
+                        navController.navigate(route)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)
@@ -205,9 +240,8 @@ fun MedicalDataScreen(
                     }
                     is MedicalDataUiState.Success -> {
                         diagnosisData?.let { data ->
-                            // Grau de dependència con el mismo diseño que otros campos
                             InputField(
-                                value = data.degreeOfDependence.toString(), // O mapea a "Dependent parcial" si es necesario
+                                value = data.degreeOfDependence.toString(),
                                 label = "Grau de Dependència",
                                 enabled = false
                             )
@@ -299,18 +333,6 @@ fun MedicalDataScreen(
 }
 
 @Composable
-fun MedicalDrawerItem(text: String, onClick: () -> Unit) {
-    Text(
-        text = text,
-        fontSize = 18.sp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp)
-    )
-}
-
-@Composable
 fun InputField(value: String, label: String, enabled: Boolean) {
     OutlinedTextField(
         value = value,
@@ -321,9 +343,7 @@ fun InputField(value: String, label: String, enabled: Boolean) {
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
-        }
-
-        ,
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
