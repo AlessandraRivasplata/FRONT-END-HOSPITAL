@@ -89,10 +89,22 @@ fun AddCaresScreen(
     var respiratoryError by remember { mutableStateOf<String?>(null) }
     var pulseError by remember { mutableStateOf<String?>(null) }
     var oxygenError by remember { mutableStateOf<String?>(null) }
+    var higieneError by remember { mutableStateOf<String?>(null) }
+    var texturaError by remember { mutableStateOf<String?>(null) }
+    var dietaTipoError by remember { mutableStateOf<String?>(null) }
+    var autonomiaError by remember { mutableStateOf<String?>(null) }
+    var protesisError by remember { mutableStateOf<String?>(null) }
+    var sedestacionError by remember { mutableStateOf<String?>(null) }
+    var deambulacionError by remember { mutableStateOf<String?>(null) }
+    var deambulacionTypeError by remember { mutableStateOf<String?>(null) }
+    var cambiosPosturalesError by remember { mutableStateOf<String?>(null) }
+    var observacionesError by remember { mutableStateOf<String?>(null) }
+
 
     val mediaPlayerState = remember { mutableStateOf<MediaPlayer?>(null) }
-    var showAlert by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(false) } // Alarma de rangos fuera de lo normal
     var alertMessage by remember { mutableStateOf("") }
+    var showConfirmationDialog by remember { mutableStateOf(false) } // Diálogo de confirmación para guardar
 
     val higieneOptions = listOf("Aïllat", "Parcial al llit", "Dutxa amb ajuda", "Dutxa sense ajuda", "Autònom")
     val texturaOptions = listOf("Absoluta", "Hídrica (quantitat diària)", "Líquida", "Túrmix", "Semitova", "Tova", "Fàcil masticació", "Basal")
@@ -129,6 +141,49 @@ fun AddCaresScreen(
         }
     }
 
+    fun validateFields(): Boolean {
+        var isValid = true
+
+        systolicError = null
+        diastolicError = null
+        tempError = null
+        respiratoryError = null
+        pulseError = null
+        oxygenError = null
+        higieneError = null
+        texturaError = null
+        dietaTipoError = null
+        autonomiaError = null
+        protesisError = null
+        sedestacionError = null
+        deambulacionError = null
+        deambulacionTypeError = null
+        cambiosPosturalesError = null
+        observacionesError = null
+
+        if (tensionSistolica.text.isEmpty()) { systolicError = "Requerit"; isValid = false }
+        if (tensionDiastolica.text.isEmpty()) { diastolicError = "Requerit"; isValid = false }
+        if (frecuenciaRespiratoria.text.isEmpty()) { respiratoryError = "Requerit"; isValid = false }
+        if (pulso.text.isEmpty()) { pulseError = "Requerit"; isValid = false }
+        if (temperatura.text.isEmpty()) { tempError = "Requerit"; isValid = false }
+        if (saturacionOxigeno.text.isEmpty()) { oxygenError = "Requerit"; isValid = false }
+        if (tipusHigiene.isEmpty()) { higieneError = "Requerit"; isValid = false }
+        if (selectedTextura.isEmpty()) { texturaError = "Requerit"; isValid = false }
+        if (selectedTipusDieta.isEmpty()) { dietaTipoError = "Requerit"; isValid = false }
+        if (autonomiaAlimentaria.isEmpty()) { autonomiaError = "Requerit"; isValid = false }
+        if (portadorProtesis.isEmpty()) { protesisError = "Requerit"; isValid = false }
+        if (sedestacion.text.isEmpty()) { sedestacionError = "Requerit"; isValid = false }
+        if (selectedDeambulacion.isEmpty()) { deambulacionError = "Requerit"; isValid = false }
+        else if (selectedDeambulacion == "Sí") {
+            if (selectedDeambulacionType.isEmpty()) { deambulacionTypeError = "Requerit si Deambulació és Sí"; isValid = false }
+        }
+        if (cambiosPosturales.text.isEmpty()) { cambiosPosturalesError = "Requerit"; isValid = false }
+        if (observaciones.text.isEmpty()) { observacionesError = "Requerit"; isValid = false }
+
+        return isValid
+    }
+
+    // Diálogo de alerta por rangos fuera de lo normal
     if (showAlert) {
         AlertDialog(
             onDismissRequest = {
@@ -136,21 +191,89 @@ fun AddCaresScreen(
                 mediaPlayerState.value?.release()
                 mediaPlayerState.value = null
                 showAlert = false
+                showConfirmationDialog = true // Mostrar el diálogo de confirmación después de la alerta
             },
             title = { Text("Alerta de Constants Vitals") },
-            text = { Text(alertMessage) },
+            text = { Text(alertMessage + "\n\nEstàs segur que vols guardar aquests valors anòmals?") },
             confirmButton = {
                 TextButton(onClick = {
                     mediaPlayerState.value?.stop()
                     mediaPlayerState.value?.release()
                     mediaPlayerState.value = null
                     showAlert = false
+                    showConfirmationDialog = true // Mostrar el diálogo de confirmación si acepta la alerta
                 }) {
                     Text("D'acord")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mediaPlayerState.value?.stop()
+                    mediaPlayerState.value?.release()
+                    mediaPlayerState.value = null
+                    showAlert = false
+                    // No se muestra el diálogo de confirmación si cancela la alerta
+                }) {
+                    Text("Cancel·lar")
                 }
             }
         )
     }
+
+    // Diálogo de confirmación para guardar (NUEVO)
+    if (showConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDialog = false },
+            title = { Text("Confirmar Creació de Cura") },
+            text = { Text("Estàs segur que vols crear aquesta cura?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showConfirmationDialog = false
+                    // Lógica para guardar la cura
+                    val formatter =
+                        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                    val recordedAt = formatter.format(Date())
+
+                    val jsonData = CreateCare(
+                        patient = PatientId(patientId?.toIntOrNull()),
+                        nurse = NurseId(nurseSharedViewModel.nurse?.id),
+                        systolic_bp = tensionSistolica.text.toIntOrNull(),
+                        diastolic_bp = tensionDiastolica.text.toIntOrNull(),
+                        respiratory_rate = frecuenciaRespiratoria.text.toIntOrNull(),
+                        pulse = pulso.text.toIntOrNull(),
+                        body_temperature = temperatura.text.toDoubleOrNull(),
+                        oxygen_saturation = saturacionOxigeno.text.toDoubleOrNull(),
+                        drainage_type = drenajeTipo.text.takeIf { it.isNotEmpty() },
+                        drainage_debit = drenajeDebito.text.toIntOrNull(),
+                        hygine_type = tipusHigiene,
+                        diet_texture = selectedTextura,
+                        diet_type = selectedTipusDieta.joinToString(","),
+                        diet_autonomy = autonomiaAlimentaria,
+                        prosthesis = portadorProtesis,
+                        sedation = sedestacion.text,
+                        ambulation = if (selectedDeambulacion == "Sí") "$selectedDeambulacion ($selectedDeambulacionType)" else selectedDeambulacion,
+                        postural_changes = cambiosPosturales.text,
+                        recorded_at = recordedAt,
+                        note = observaciones.text
+                    )
+
+                    scope.launch {
+                        createCareViewModel.createCare(jsonData)
+                        snackbarHostState.showSnackbar("La cura s'ha desat correctament")
+                        navController.popBackStack()
+                    }
+                }) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmationDialog = false }) {
+                    Text("Cancel·lar")
+                }
+            }
+        )
+    }
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -295,108 +418,39 @@ fun AddCaresScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        systolicError =
-                            if (tensionSistolica.text.isNotEmpty() && tensionSistolica.text.toIntOrNull() !in 50..250) {
-                                "Rang no vàlid (90-140)"
-                            } else null
-                        diastolicError =
-                            if (tensionDiastolica.text.isNotEmpty() && tensionDiastolica.text.toIntOrNull() !in 30..150) {
-                                "Rang no vàlid (50-90)"
-                            } else null
-                        tempError = if (temperatura.text.isNotEmpty()) {
-                            val tempValue = temperatura.text.toDoubleOrNull()
-                            if (tempValue != null && tempValue !in 34.0..42.0) {
-                                "Rang no vàlid (12-20)"
-                            } else null
-                        } else null
-                        respiratoryError =
-                            if (frecuenciaRespiratoria.text.isNotEmpty() && frecuenciaRespiratoria.text.toIntOrNull() !in 0..100) {
-                                "Rang no vàlid (50-100)"
-                            } else null
-                        pulseError =
-                            if (pulso.text.isNotEmpty() && pulso.text.toIntOrNull() !in 0..200) {
-                                "Rang no vàlid (34.9-38.5)"
-                            } else null
-                        oxygenError = if (saturacionOxigeno.text.isNotEmpty()) {
-                            val oxygenValue = saturacionOxigeno.text.toDoubleOrNull()
-                            if (oxygenValue != null && oxygenValue !in 0.0..100.0) {
-                                "Rang no vàlid (≥94)"
-                            } else null
-                        } else null
-
+                        val isFormValid = validateFields()
                         val alerts = mutableListOf<String>()
+
+                        // Validaciones de rangos para alertas
                         tensionSistolica.text.toIntOrNull()?.let {
-                            if (it > 140 || it < 90) {
-                                alerts.add("Tensió Sistòlica fora de rang: $it (Límit: 90-140)")
-                            }
+                            if (it > 140 || it < 90) { alerts.add("Tensió Sistòlica fora de rang: $it (Límit: 90-140)") }
                         }
                         tensionDiastolica.text.toIntOrNull()?.let {
-                            if (it >= 90 || it < 50) {
-                                alerts.add("Tensió Diastòlica fora de rang: $it (Límit: 50-<90)")
-                            }
+                            if (it >= 90 || it < 50) { alerts.add("Tensió Diastòlica fora de rang: $it (Límit: 50-<90)") }
                         }
                         frecuenciaRespiratoria.text.toIntOrNull()?.let {
-                            if (it > 20 || it < 12) {
-                                alerts.add("Freqüència Respiratòria fora de rang: $it (Límit: 12-20)")
-                            }
+                            if (it > 20 || it < 12) { alerts.add("Freqüència Respiratòria fora de rang: $it (Límit: 12-20)") }
                         }
                         pulso.text.toIntOrNull()?.let {
-                            if (it > 100 || it < 50) {
-                                alerts.add("Pols fora de rang: $it (Límit: 50-100)")
-                            }
+                            if (it > 100 || it < 50) { alerts.add("Pols fora de rang: $it (Límit: 50-100)") }
                         }
                         temperatura.text.toDoubleOrNull()?.let {
-                            if (it > 38.5 || it < 34.9) {
-                                alerts.add("Temperatura fora de rang: $it°C (Límit: 34.9-38.5)")
-                            }
+                            if (it > 38.5 || it < 34.9) { alerts.add("Temperatura fora de rang: $it°C (Límit: 34.9-38.5)") }
                         }
                         saturacionOxigeno.text.toDoubleOrNull()?.let {
-                            if (it < 94.0) {
-                                alerts.add("Saturació d'Oxigen fora de rang: $it% (Límit: ≥94%)")
-                            }
+                            if (it < 94.0) { alerts.add("Saturació d'Oxigen fora de rang: $it% (Límit: ≥94%)") }
                         }
 
-                        if (alerts.isNotEmpty()) {
-                            alertMessage = alerts.joinToString("\n")
-                            showAlert = true
-                            playAlarmSound(mediaPlayerState)
-                        }
-
-                        if (systolicError == null && diastolicError == null && tempError == null &&
-                            respiratoryError == null && pulseError == null && oxygenError == null
-                        ) {
-                            val formatter =
-                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                            val recordedAt = formatter.format(Date())
-
-                            val jsonData = CreateCare(
-                                patient = PatientId(patientId?.toIntOrNull()),
-                                nurse = NurseId(nurseSharedViewModel.nurse?.id),
-                                systolic_bp = tensionSistolica.text.toIntOrNull(),
-                                diastolic_bp = tensionDiastolica.text.toIntOrNull(),
-                                respiratory_rate = frecuenciaRespiratoria.text.toIntOrNull(),
-                                pulse = pulso.text.toIntOrNull(),
-                                body_temperature = temperatura.text.toDoubleOrNull(),
-                                oxygen_saturation = saturacionOxigeno.text.toDoubleOrNull(),
-                                drainage_type = drenajeTipo.text,
-                                drainage_debit = drenajeDebito.text.toIntOrNull(),
-                                hygine_type = tipusHigiene,
-                                diet_texture = selectedTextura,
-                                diet_type = selectedTipusDieta.joinToString(","),
-                                diet_autonomy = autonomiaAlimentaria,
-                                prosthesis = portadorProtesis,
-                                sedation = sedestacion.text,
-                                ambulation = if (selectedDeambulacion == "Sí") "$selectedDeambulacion ($selectedDeambulacionType)" else selectedDeambulacion,
-                                postural_changes = cambiosPosturales.text,
-                                recorded_at = recordedAt,
-                                note = observaciones.text
-                            )
-
-                            scope.launch {
-                                createCareViewModel.createCare(jsonData)
-                                snackbarHostState.showSnackbar("La cura s'ha desat correctament")
-                                navController.popBackStack()
+                        if (isFormValid) { // Primero, verifica si todos los campos obligatorios están llenos
+                            if (alerts.isNotEmpty()) { // Si hay alertas de rango
+                                alertMessage = alerts.joinToString("\n")
+                                showAlert = true // Activa el diálogo de alerta (que luego activará el de confirmación si se acepta)
+                                playAlarmSound(mediaPlayerState)
+                            } else { // Si no hay alertas de rango y el formulario es válido
+                                showConfirmationDialog = true // Directamente muestra el diálogo de confirmación
                             }
+                        } else { // Si el formulario no es válido (faltan campos obligatorios)
+                            scope.launch { snackbarHostState.showSnackbar("Si us plau, omple tots els camps obligatoris.") }
                         }
                     }
                 ) {
@@ -619,7 +673,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = higieneError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expanded,
@@ -631,10 +686,19 @@ fun AddCaresScreen(
                                                     onClick = {
                                                         tipusHigiene = option
                                                         expanded = false
+                                                        higieneError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (higieneError != null) {
+                                        Text(
+                                            text = higieneError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                 }
                             }
@@ -694,7 +758,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = texturaError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expandedTextura,
@@ -706,10 +771,19 @@ fun AddCaresScreen(
                                                     onClick = {
                                                         selectedTextura = option
                                                         expandedTextura = false
+                                                        texturaError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (texturaError != null) {
+                                        Text(
+                                            text = texturaError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                     Text(
                                         "Tipus de dieta",
@@ -732,7 +806,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = dietaTipoError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expandedTipusDieta,
@@ -747,10 +822,19 @@ fun AddCaresScreen(
                                                         } else {
                                                             selectedTipusDieta + option
                                                         }
+                                                        dietaTipoError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (dietaTipoError != null) {
+                                        Text(
+                                            text = dietaTipoError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                     Text(
                                         "Autonomia alimentària",
@@ -773,7 +857,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = autonomiaError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expandedAutonomia,
@@ -785,10 +870,19 @@ fun AddCaresScreen(
                                                     onClick = {
                                                         autonomiaAlimentaria = option
                                                         expandedAutonomia = false
+                                                        autonomiaError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (autonomiaError != null) {
+                                        Text(
+                                            text = autonomiaError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                     Text(
                                         "Portador de pròtesis",
@@ -811,7 +905,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = protesisError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expandedProtesis,
@@ -823,10 +918,19 @@ fun AddCaresScreen(
                                                     onClick = {
                                                         portadorProtesis = option
                                                         expandedProtesis = false
+                                                        protesisError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (protesisError != null) {
+                                        Text(
+                                            text = protesisError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                 }
                             }
@@ -870,6 +974,7 @@ fun AddCaresScreen(
                                         onValueChange = { sedestacion = it },
                                         label = "Sedestació",
                                         placeholder = "Allitat, Incorporat, Cadira de rodes...",
+                                        error = sedestacionError
                                     )
                                     Text(
                                         "Deambulació",
@@ -892,7 +997,8 @@ fun AddCaresScreen(
                                             },
                                             modifier = Modifier
                                                 .menuAnchor()
-                                                .fillMaxWidth()
+                                                .fillMaxWidth(),
+                                            isError = deambulacionError != null
                                         )
                                         ExposedDropdownMenu(
                                             expanded = expandedDeambulacion,
@@ -905,10 +1011,20 @@ fun AddCaresScreen(
                                                         selectedDeambulacion = option
                                                         if (option != "Sí") selectedDeambulacionType = ""
                                                         expandedDeambulacion = false
+                                                        deambulacionError = null
+                                                        deambulacionTypeError = null
                                                     }
                                                 )
                                             }
                                         }
+                                    }
+                                    if (deambulacionError != null) {
+                                        Text(
+                                            text = deambulacionError!!,
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                        )
                                     }
                                     if (selectedDeambulacion == "Sí") {
                                         var expandedDeambulacionType by remember { mutableStateOf(false) }
@@ -926,7 +1042,8 @@ fun AddCaresScreen(
                                                 },
                                                 modifier = Modifier
                                                     .menuAnchor()
-                                                    .fillMaxWidth()
+                                                    .fillMaxWidth(),
+                                                isError = deambulacionTypeError != null
                                             )
                                             ExposedDropdownMenu(
                                                 expanded = expandedDeambulacionType,
@@ -938,10 +1055,19 @@ fun AddCaresScreen(
                                                         onClick = {
                                                             selectedDeambulacionType = option
                                                             expandedDeambulacionType = false
+                                                            deambulacionTypeError = null
                                                         }
                                                     )
                                                 }
                                             }
+                                        }
+                                        if (deambulacionTypeError != null) {
+                                            Text(
+                                                text = deambulacionTypeError!!,
+                                                color = MaterialTheme.colorScheme.error,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                            )
                                         }
                                     }
                                     InputField(
@@ -949,6 +1075,7 @@ fun AddCaresScreen(
                                         onValueChange = { cambiosPosturales = it },
                                         label = "Cavis Posturals",
                                         placeholder = "De allitat a incorporat...",
+                                        error = cambiosPosturalesError
                                     )
                                 }
                             }
@@ -970,7 +1097,8 @@ fun AddCaresScreen(
                                 label = "Observacions",
                                 placeholder = "Cura realizada sin problemas",
                                 singleLine = false,
-                                modifier = Modifier.height(100.dp)
+                                modifier = Modifier.height(100.dp),
+                                error = observacionesError
                             )
                         }
                     }
