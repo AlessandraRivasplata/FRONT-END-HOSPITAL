@@ -36,7 +36,7 @@ import com.hospitalfrontend.ui.sharedViewModel.NurseSharedViewModel
 fun MedicalDataScreen(
     navController: NavController,
     patientId: String?,
-    medicalDataViewModel: MedicalDataViewModel = viewModel(), // Obtener la instancia del ViewModel
+    medicalDataViewModel: MedicalDataViewModel = viewModel(),
     nurseSharedViewModel: NurseSharedViewModel = viewModel(LocalContext.current as ComponentActivity)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -113,6 +113,10 @@ fun MedicalDataScreen(
                     MedicalDrawerItem("Registre de cures") {
                         scope.launch { drawerState.close() }
                         // navController.navigate("care_data/$patientId")
+                    }
+                    MedicalDrawerItem("Gràfic Constants Vitals") {
+                        scope.launch { drawerState.close() }
+                        navController.navigate("grafic_screen/$patientId")
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Divider(color = Color(0xFFB2DFDB), thickness = 1.dp)

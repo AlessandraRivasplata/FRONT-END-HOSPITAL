@@ -1,6 +1,7 @@
 package com.hospitalfrontend.navigation
 
 import AddCaresScreen
+import GraficScreen
 import NurseLoginScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -11,7 +12,6 @@ import androidx.navigation.compose.rememberNavController
 import com.hospitalfrontend.ui.home.HomeScreen
 import com.hospitalfrontend.ui.profile.MedicalDataScreen
 import com.hospitalfrontend.ui.nurseinfo.byname.FindNurseScreen
-
 import com.hospitalfrontend.ui.authentication.NurseRegisterScreen
 import com.hospitalfrontend.ui.authentication.NurseAuthViewModel
 import com.hospitalfrontend.ui.authentication.NurseLoginViewModel
@@ -23,24 +23,24 @@ import com.hospitalfrontend.ui.nurseinfo.screen.DeleteNurseViewModel
 import com.hospitalfrontend.ui.nurseinfo.screen.NurseInfoScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseScreen
 import com.hospitalfrontend.ui.nurseinfo.screen.UpdateNurseViewModel
-import com.hospitalfrontend.ui.nurseprofile.NurseProfileScreen // Import NurseProfileScreen
-import com.hospitalfrontend.ui.nurseprofile.NurseProfileViewModel // Import NurseProfileViewModel
+import com.hospitalfrontend.ui.nurseprofile.NurseProfileScreen
+import com.hospitalfrontend.ui.nurseprofile.NurseProfileViewModel
 import com.hospitalfrontend.ui.patients.ListPatients
 import com.hospitalfrontend.ui.profile.PersonalDataScreen
 import com.hospitalfrontend.ui.profile.CareDataScreen
 import com.hospitalfrontend.ui.rooms.ListRoomScreen
-
+import com.hospitalfrontend.ui.grafic.VitalSignsViewModel
 
 @Composable
 fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
-    val nurseAuthViewModel: NurseAuthViewModel = viewModel() // Though not directly used in profile, kept for consistency
+    val nurseAuthViewModel: NurseAuthViewModel = viewModel()
     val nurseRegisterViewModel: NurseRegisterViewModel = viewModel()
-    val nurseLoginViewModel: NurseLoginViewModel = viewModel() // Used to get logged-in nurse ID
+    val nurseLoginViewModel: NurseLoginViewModel = viewModel()
     val deleteNurseViewModel: DeleteNurseViewModel = viewModel()
     val updateNurseViewModel: UpdateNurseViewModel = viewModel()
     val findNurseByIdViewModel: FindNurseByIdViewModel = viewModel()
-    val nurseProfileViewModel: NurseProfileViewModel = viewModel() // Instantiate ViewModel for profile
+    val nurseProfileViewModel: NurseProfileViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "login_nurse") {
 
@@ -61,13 +61,24 @@ fun AppNavigation() {
             AddCaresScreen(navController = navController, patientId = patientId)
         }
 
+        // Nueva ruta para GraficScreen
+        composable("grafic_screen/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull() ?: 0
+            val graficViewModel: VitalSignsViewModel = viewModel()
+            GraficScreen(
+                patientId = patientId,
+                viewModel = graficViewModel,
+                navController = navController
+            )
+        }
+
         // Existing routes...
-        composable("home") { HomeScreen(navController) } // Assuming HomeScreen exists or is defined elsewhere
+        composable("home") { HomeScreen(navController) }
         composable("find_nurse") {
             FindNurseScreen(
                 navController = navController,
                 nurseAuthViewModel = nurseAuthViewModel,
-                findNurseViewModel = viewModel() // Or pass a specific instance if needed
+                findNurseViewModel = viewModel()
             )
         }
         composable("login_nurse") {
@@ -79,7 +90,7 @@ fun AppNavigation() {
                 createNurseViewModel = nurseRegisterViewModel
             )
         }
-        composable("screen_nurse") { // This might be your old nurse info screen
+        composable("screen_nurse") {
             NurseInfoScreen(
                 navController,
                 nurseAuthViewModel,
@@ -105,7 +116,6 @@ fun AppNavigation() {
         composable("list_rooms") {
             ListRoomScreen(navController)
         }
-
         composable("care_details/{careId}/{patientId}") { backStackEntry ->
             val careId = backStackEntry.arguments?.getString("careId")?.toIntOrNull()
             val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull()
@@ -118,17 +128,14 @@ fun AppNavigation() {
                 )
             }
         }
-
         composable("list_patients/{roomNumber}") { backStackEntry ->
             val roomNumber = backStackEntry.arguments?.getString("roomNumber")
             ListPatients(navController, roomNumber)
         }
-
-        // New route for Nurse Profile
         composable("nurse_profile") {
             NurseProfileScreen(
                 navController = navController,
-                nurseLoginViewModel = nurseLoginViewModel, // Pass the ViewModel that holds logged-in nurse info
+                nurseLoginViewModel = nurseLoginViewModel,
                 nurseProfileViewModel = nurseProfileViewModel
             )
         }

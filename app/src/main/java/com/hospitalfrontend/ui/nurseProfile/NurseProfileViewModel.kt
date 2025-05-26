@@ -28,7 +28,7 @@ class NurseProfileViewModel : ViewModel() {
             _nurseProfileUiState.value = NurseProfileUiState.Loading
             try {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080") // Ensure this matches your backend URL
+                    .baseUrl("http://192.168.43.219:8080") // Ensure this matches your backend URL
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

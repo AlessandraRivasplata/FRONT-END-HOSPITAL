@@ -10,6 +10,7 @@ import com.hospitalfrontend.model.PatientResponse
 import com.hospitalfrontend.model.PatientResponseById
 import com.hospitalfrontend.model.RemoteMessage
 import com.hospitalfrontend.model.RoomResponse
+import com.hospitalfrontend.model.VitalSignsDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -77,4 +78,6 @@ interface RemoteMessageInterface {
     @POST("/care")
     suspend fun createCare(@Body care: CreateCare): Response<RemoteMessage>
 
+    @GET("/patient/vitals/{id}")
+    suspend fun getVitalSignsByPatientId(@Path("id") patientId: Int): Response<List<VitalSignsDTO>>
 }
